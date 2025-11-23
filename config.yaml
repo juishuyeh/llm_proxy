@@ -1,42 +1,51 @@
 model_list:
-  - model_name: openai/gpt-oss-20b
+  - model_name: x-ai/grok-4.1-fast
     litellm_params:
-      model: openrouter/openai/gpt-oss-20b:free
-  - model_name: x-ai/grok-4-fast
-    litellm_params:
-      model: openrouter/x-ai/grok-4-fast:free
+      model: openrouter/x-ai/grok-4.1-fast:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: deepseek/deepseek-r1-0528-qwen3-8b
     litellm_params:
       model: openrouter/deepseek/deepseek-r1-0528-qwen3-8b:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: google/gemma-3-12b-it
     litellm_params:
       model: openrouter/google/gemma-3-12b-it:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+  - model_name: openrouter/google/gemma-3-12b-it
+    litellm_params:
+      model: openrouter/google/gemma-3-12b-it:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: google/gemma-3-27b-it
     litellm_params:
       model: openrouter/google/gemma-3-27b-it:free
-  - model_name: lm_studio/gpt-oss-20b
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+  - model_name: qwen/qwen3-coder
     litellm_params:
-      model: lm_studio/openai/gpt-oss-20b
-  - model_name: lm_studio/deepseek-r1-0528-qwen3-8b
+      model: openrouter/qwen/qwen3-coder:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+  - model_name: openai/gpt-oss-20b
     litellm_params:
-      model: lm_studio/deepseek/deepseek-r1-0528-qwen3-8b
-  - model_name: lm_studio/gemma-3-12b
+      model: openai/gpt-oss-20b:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+  - model_name: google/gemini-2.5-flash
     litellm_params:
-      model: lm_studio/google/gemma-3-12b
-  - model_name: qwen3-32b
-    litellm_params:
-      model: lm_studio/qwen/qwen3-32b
-  - model_name: grok-4
-    litellm_params:
-      model: openrouter/x-ai/grok-4-fast:free
-  - model_name: grok-4-fast
-    litellm_params:
-      model: openrouter/x-ai/grok-4-fast:free
+      model: google/gemini-2.0-flash-exp:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+
 
 litellm_settings:
   drop_params: true
   success_callback: ["mlflow"]
   failure_callback: ["mlflow"]
+  callbacks: ["prometheus"]
 
 general_settings:
   master_key: "sk-litellm-master-key"

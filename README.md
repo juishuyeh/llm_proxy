@@ -64,3 +64,34 @@ litellm --config config.yaml --port 4000 --detailed_debug
 ```bash
 uv run mlflow server --backend-store-uri sqlite:///mlflow.db --host 0.0.0.0 --port 8080
 ```
+
+cd ~/src/llm_proxy
+docker compose up -d
+
+這個指令會：
+- 啟動所有服務（LiteLLM、PostgreSQL、MLflow、Prometheus）
+- -d 表示在背景運行
+
+其他常用指令：
+
+# 停止所有服務
+docker compose down
+
+# 查看服務狀態
+docker compose ps
+
+# 查看日誌
+docker compose logs -f litellm
+docker compose logs -f mlflow
+
+# 重啟特定服務
+docker compose restart litellm
+docker compose restart mlflow
+
+服務訪問地址：
+- LiteLLM UI: http://localhost:4000/ui
+- MLflow UI: http://localhost:5001
+- Prometheus: http://localhost:9090
+
+因為已經配置了 restart: always，所以只要 Docker Desktop 在運行，服務會自動啟動。但如果 Docker Desktop 關閉後重開，執行 docker compose
+up -d 即可。

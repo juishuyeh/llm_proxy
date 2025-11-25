@@ -14,11 +14,6 @@ model_list:
       model: openrouter/google/gemma-3-12b-it:free
       api_key: "os.environ/OPENROUTER_API_KEY"
       rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
-  - model_name: openrouter/google/gemma-3-12b-it
-    litellm_params:
-      model: openrouter/google/gemma-3-12b-it:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: google/gemma-3-27b-it
     litellm_params:
       model: openrouter/google/gemma-3-27b-it:free
@@ -31,7 +26,7 @@ model_list:
       rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: openai/gpt-oss-20b
     litellm_params:
-      model: openai/gpt-oss-20b:free
+      model: openrouter/openai/gpt-oss-20b:free
       api_key: "os.environ/OPENROUTER_API_KEY"
       rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: google/gemini-2.5-flash
@@ -48,4 +43,4 @@ litellm_settings:
   callbacks: ["prometheus"]
 
 general_settings:
-  master_key: "sk-litellm-master-key"
+  master_key: "os.environ/LITELLM_MASTER_KEY"

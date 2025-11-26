@@ -65,33 +65,6 @@ services:
       timeout: 5s
       retries: 10
 
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=15d"
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 2G
-        reservations:
-          cpus: '0.25'
-          memory: 512M
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
   mlflow:
     build:
       context: .
@@ -129,8 +102,6 @@ services:
       start_period: 10s
 
 volumes:
-  prometheus_data:
-    driver: local
   postgres_data:
     name: litellm_postgres_data # Named volume for Postgres data persistence
   mlflow_data:

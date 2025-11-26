@@ -295,7 +295,7 @@ uv run litellm --config config.yaml --port 4000 --detailed_debug
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                   User / Application                 │
+│                   User / Application                │
 └───────────────────┬─────────────────────────────────┘
                     │ HTTP Requests
                     ▼

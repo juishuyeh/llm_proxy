@@ -40,7 +40,6 @@ litellm_settings:
   drop_params: true
   success_callback: ["mlflow"]
   failure_callback: ["mlflow"]
-  callbacks: ["prometheus"]
 
 general_settings:
   master_key: "os.environ/LITELLM_MASTER_KEY"

@@ -9,31 +9,47 @@ model_list:
       model: openrouter/deepseek/deepseek-r1-0528-qwen3-8b:free
       api_key: "os.environ/OPENROUTER_API_KEY"
       rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
-  - model_name: google/gemma-3-12b-it
-    litellm_params:
-      model: openrouter/google/gemma-3-12b-it:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
-  - model_name: google/gemma-3-27b-it
-    litellm_params:
-      model: openrouter/google/gemma-3-27b-it:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
-  - model_name: qwen/qwen3-coder
-    litellm_params:
-      model: openrouter/qwen/qwen3-coder:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: openai/gpt-oss-20b
     litellm_params:
       model: openrouter/openai/gpt-oss-20b:free
       api_key: "os.environ/OPENROUTER_API_KEY"
       rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
-  - model_name: google/gemini-2.5-flash
+  - model_name: gemini-2.5-pro
     litellm_params:
-      model: google/gemini-2.0-flash-exp:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+      model: gemini/gemini-2.5-pro
+      api_key: "os.environ/GEMINI_API_KEY"
+      rpm: 2
+      tpm: 125000
+      rpd: 50
+  - model_name: gemini-2.5-flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: "os.environ/GEMINI_API_KEY"
+      rpm: 10
+      tpm: 250000
+      rpd: 250
+  - model_name: gemini-2.5-flash-lite
+    litellm_params:
+      model: gemini/gemini-2.5-flash-lite
+      api_key: "os.environ/GEMINI_API_KEY"
+      rpm: 15
+      tpm: 250000
+      rpd: 1000
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash
+      api_key: "os.environ/GEMINI_API_KEY"
+      rpm: 15
+      tpm: 1000000
+      rpd: 200
+  - model_name: gemini-2.0-flash-lite
+    litellm_params:
+      model: gemini/gemini-2.0-flash-lite
+      api_key: "os.environ/GEMINI_API_KEY"
+      rpm: 30
+      tpm: 1000000
+      rpd: 200
+
 
 
 litellm_settings:

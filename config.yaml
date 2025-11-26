@@ -4,11 +4,6 @@ model_list:
       model: openrouter/x-ai/grok-4.1-fast:free
       api_key: "os.environ/OPENROUTER_API_KEY"
       rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
-  - model_name: deepseek/deepseek-r1-0528-qwen3-8b
-    litellm_params:
-      model: openrouter/deepseek/deepseek-r1-0528-qwen3-8b:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
   - model_name: openai/gpt-oss-20b
     litellm_params:
       model: openrouter/openai/gpt-oss-20b:free

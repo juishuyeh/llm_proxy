@@ -217,3 +217,20 @@ __marimo__/
 
 # macOS
 .DS_Store
+
+# SSL 憑證和私鑰 (敏感資料,不要提交到版本控制)
+ssl/
+*.pem
+*.key
+*.crt
+
+# Nginx 配置 (包含個人域名,使用 nginx.conf.example 作為範本)
+nginx.conf
+
+# 備份檔案
+backup-*.tar.gz
+
+# Docker volumes 資料
+postgres_data/
+mlflow_data/
+nginx_logs/

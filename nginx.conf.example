@@ -1,0 +1,96 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    # 基本設定
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+
+    # SSL 設定
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # 日誌設定
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    # 限流設定 - 防止 API 濫用
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=100r/m;
+    limit_req_status 429;
+
+    # 上游服務定義
+    upstream litellm_backend {
+        server litellm:4000;
+    }
+
+    # HTTP 伺服器 - 重定向到 HTTPS
+    server {
+        listen 80;
+        server_name _;
+
+        # 健康檢查端點不需要 HTTPS
+        location /health {
+            proxy_pass http://litellm_backend;
+        }
+
+        # 其他所有請求重定向到 HTTPS
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
+
+    # HTTPS 伺服器
+    server {
+        listen 443 ssl;
+        server_name your-domain.synology.me;  # ⚠️ 替換為您的實際域名
+
+        # SSL 憑證路徑 (使用 Let's Encrypt)
+        ssl_certificate /etc/nginx/ssl/cert.pem;
+        ssl_certificate_key /etc/nginx/ssl/key.pem;
+
+        # 安全標頭
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+
+        # 客戶端請求大小限制
+        client_max_body_size 10M;
+
+        # API 路由
+        location / {
+            # 限流保護
+            limit_req zone=api_limit burst=20 nodelay;
+
+            # 代理設定
+            proxy_pass http://litellm_backend;
+            proxy_http_version 1.1;
+
+            # WebSocket 支持
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            # 標準代理標頭
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # 超時設定
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # 健康檢查端點
+        location /health {
+            proxy_pass http://litellm_backend;
+            access_log off;
+        }
+    }
+}

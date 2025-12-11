@@ -40,10 +40,10 @@ services:
     ##############################################
     restart: always
     
-    ports: # 移除直接對外暴露的端口,改為只在 Docker 內部網路暴露
-      - "4000:4000" # 移除直接對外暴露的端口,改為只在 Docker 內部網路暴露
+    ports:
+      - "4000:4000" # 直接對外暴露的端口
     expose:
-      - "4000"  # 只在 Docker 內部網路可見,透過 Nginx 訪問
+      - "4000"  # 在 Docker 內部網路可見,透過 Nginx 訪問
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER:-llmproxy}:${POSTGRES_PASSWORD:-dbpassword9090}@db:5432/${POSTGRES_DB:-litellm}"
       STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
@@ -104,7 +104,7 @@ services:
       dockerfile: Dockerfile.mlflow
     container_name: mlflow
     ports:
-      - "5001:5000"
+      - "127.0.0.1:5001:5000"  # 只允許宿主機本地訪問,不暴露到區網
     volumes:
       - mlflow_data:/mlflow/artifacts
     command:
@@ -114,7 +114,6 @@ services:
       - --port=5000
       - --backend-store-uri=postgresql://${POSTGRES_USER:-llmproxy}:${POSTGRES_PASSWORD:-dbpassword9090}@db:5432/mlflow
       - --default-artifact-root=/mlflow/artifacts
-      - --allowed-hosts=*
     depends_on:
       - db
     restart: always

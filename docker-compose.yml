@@ -97,6 +97,7 @@ services:
       - --port=5000
       - --backend-store-uri=postgresql://${POSTGRES_USER:-llmproxy}:${POSTGRES_PASSWORD:-dbpassword9090}@db:5432/mlflow
       - --default-artifact-root=/mlflow/artifacts
+      - --allowed-hosts=mlflow:5000,mlflow,localhost:5001
     depends_on:
       - db
     restart: always

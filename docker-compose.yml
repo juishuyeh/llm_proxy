@@ -11,8 +11,7 @@ services:
       - ./ssl:/etc/nginx/ssl:ro
       - nginx_logs:/var/log/nginx
     depends_on:
-      litellm:
-        condition: service_healthy
+      - litellm
     deploy:
       resources:
         limits:
@@ -62,11 +61,13 @@ services:
       - db  # Indicates that this service depends on the 'db' service, ensuring 'db' starts first
       - mlflow  # Ensure MLflow starts before litellm
     healthcheck:  # Defines the health check configuration for the container
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 http://localhost:4000/health/liveliness || exit 1" ]  # Command to execute for health check
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 http://localhost:4000/health/liveliness || exit 1" ]
       interval: 30s  # Perform health check every 30 seconds
       timeout: 10s   # Health check command times out after 10 seconds
       retries: 3     # Retry up to 3 times if health check fails
-      start_period: 40s  # Wait 40 seconds after container start before beginning health checks
+      start_period: 90s  # Wait 40 seconds after container start before beginning health checks
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   db:
     image: postgres:16
@@ -115,8 +116,7 @@ services:
       - --default-artifact-root=/mlflow/artifacts
       - --allowed-hosts=*
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     restart: always
     deploy:
       resources:

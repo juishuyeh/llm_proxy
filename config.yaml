@@ -46,10 +46,28 @@ model_list:
       rpm: 10
       tpm: 250000
       rpd: 250
+  - model_name: qwen3-vl-4b
+    litellm_params:
+      model: lm_studio/qwen/qwen3-vl-4b
   - model_name: qwen3-vl-8b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-8b
-  - model_name: gpt-oss-20b-lm_studio
+  - model_name: qwen3-vl-30b
+    litellm_params:
+      model: lm_studio/qwen/qwen3-vl-30b
+  - model_name: qwen3-coder-30b
+    litellm_params:
+      model: lm_studio/qwen/qwen3-coder-30b
+  - model_name: gemma-3-1b
+    litellm_params:
+      model: lm_studio/google/gemma-3-1b
+  - model_name: gemma-3-4b
+    litellm_params:
+      model: lm_studio/google/gemma-3-4b
+  - model_name: gemma-3-12b
+    litellm_params:
+      model: lm_studio/google/gemma-3-12b
+  - model_name: gpt-oss-20b-local
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
 

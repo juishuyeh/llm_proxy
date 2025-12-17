@@ -67,12 +67,18 @@ model_list:
   - model_name: gemma-3-12b
     litellm_params:
       model: lm_studio/google/gemma-3-12b
+  - model_name: gemma-3-27b
+    litellm_params:
+      model: lm_studio/google/gemma-3-27b
   - model_name: gpt-oss-20b-local
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
   - model_name: glm-4.6v-flash
     litellm_params:
       model: lm_studio/zai-org/glm-4.6v-flash
+  - model_name: ministral-3-14b-reasoning
+    litellm_params:
+      model: lm_studio/mistralai/ministral-3-14b-reasoning
 
 litellm_settings:
   drop_params: true

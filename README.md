@@ -330,3 +330,14 @@ uv run litellm --config config.yaml --port 4000 --detailed_debug
 ## 支援
 
 如有問題或需要協助，請提交 Issue 或 Pull Request。
+
+## 重建 docker 映像檔
+如果需要重建 Docker 映像檔，可以使用以下指令：
+
+```bash
+docker compose down
+docker compose build --no-cache
+docker compose up -d
+```
+這將會忽略快取，重新建置所有服務的映像檔。
+這將會停止目前的服務，重新建置映像檔，並以分離模式啟動服務。

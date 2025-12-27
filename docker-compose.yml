@@ -39,7 +39,7 @@ services:
     expose:
       - "4000"  # 在 Docker 內部網路可見,透過 Nginx 訪問
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER:-llmproxy}:${POSTGRES_PASSWORD:-dbpassword9090}@db:5432/${POSTGRES_DB:-litellm}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
       STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
     env_file:
       - .env # Load local .env file
@@ -62,9 +62,9 @@ services:
     restart: always
     container_name: litellm_db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-litellm}
-      POSTGRES_USER: ${POSTGRES_USER:-llmproxy}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dbpassword9090}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       # 注意：此端口暴露用於外部工具連接（如 DBeaver、pgAdmin）
       # 如果不需要外部訪問，可以註解掉此行以提高安全性
@@ -95,7 +95,7 @@ services:
       - server
       - --host=0.0.0.0
       - --port=5000
-      - --backend-store-uri=postgresql://${POSTGRES_USER:-llmproxy}:${POSTGRES_PASSWORD:-dbpassword9090}@db:5432/mlflow
+      - --backend-store-uri=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/mlflow
       - --default-artifact-root=/mlflow/artifacts
       - --allowed-hosts=mlflow:5000,mlflow,localhost:5001
     depends_on:

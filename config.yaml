@@ -82,15 +82,6 @@ model_list:
   - model_name: ministral-3-14b-reasoning
     litellm_params:
       model: lm_studio/mistralai/ministral-3-14b-reasoning
-  # NVIDIA NIM MODELS
-  - model_name: deepseek-ai/deepseek-r1-distill-qwen-7b
-    litellm_params:
-      model: nvidia_nim/deepseek-ai/deepseek-r1-distill-qwen-7b
-      api_key: "os.environ/NVIDIA_NIM_API_KEY"
-  - model_name: deepseek-ai/deepseek-v3.2
-    litellm_params:
-      model: nvidia_nim/deepseek-ai/deepseek-v3.2
-      api_key: "os.environ/NVIDIA_NIM_API_KEY"
   # GITHUB MODELS
   - model_name: openai/gpt-4o-mini
     litellm_params:

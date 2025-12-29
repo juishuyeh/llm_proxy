@@ -29,6 +29,7 @@ services:
     ## Uncomment these lines to start proxy with a config.yaml file ##
     volumes:
      - ./config.yaml:/app/config.yaml
+     - github_copilot_auth_data:/root/.config/litellm/github_copilot
     command:
      - "--config=/app/config.yaml"
     ##############################################
@@ -116,4 +117,6 @@ volumes:
   mlflow_data:
     driver: local
   nginx_logs:
+    driver: local
+  github_copilot_auth_data:
     driver: local

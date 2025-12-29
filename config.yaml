@@ -87,6 +87,67 @@ model_list:
     litellm_params:
       model: nvidia_nim/deepseek-ai/deepseek-v3.2
       api_key: "os.environ/NVIDIA_NIM_API_KEY"
+  - model_name: github-Llama-3.2-11B-Vision-Instruct
+    litellm_params:
+      model: github/Llama-3.2-11B-Vision-Instruct
+      api_key: "os.environ/GITHUB_API_KEY"
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: github_copilot/gpt-4o-mini-2024-07-18
+      rpm: 20
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+  - model_name: gpt-4.1
+    litellm_params:
+      model: github_copilot/gpt-4.1-2025-04-14
+      rpm: 20
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
+  - model_name: gpt-4o
+    litellm_params:
+      model: github_copilot/gpt-4o-2024-11-20
+      rpm: 20
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
+  - model_name: gpt-5-mini
+    litellm_params:
+      model: github_copilot/gpt-5-mini
+      rpm: 20
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
+  - model_name: grok-code-fast
+    litellm_params:
+      model: github_copilot/grok-code-fast-1
+      rpm: 20
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+  - model_name: raptor-mini
+    litellm_params:
+      model: github_copilot/raptor-mini
+      rpm: 20
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
 
 litellm_settings:
   drop_params: true

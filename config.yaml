@@ -1,9 +1,11 @@
 model_list:
-  - model_name: gpt-oss-20b
+  # OPENROUTER MODELS
+  - model_name: openai/gpt-oss-20b
     litellm_params:
       model: openrouter/openai/gpt-oss-20b:free
       api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18  # OpenRouter 免費模型限制是 20 RPM,留緩衝設 18
+      rpm: 18
+  # GOOGLE GEMINI MODELS
   - model_name: gemini-2.5-pro
     litellm_params:
       model: gemini/gemini-2.5-pro
@@ -46,16 +48,17 @@ model_list:
       rpm: 10
       tpm: 250000
       rpd: 250
-  - model_name: qwen3-vl-4b
+  # LM STUDIO MODELS
+  - model_name: qwen/qwen3-vl-4b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-4b
-  - model_name: qwen3-vl-8b
+  - model_name: qwen/qwen3-vl-8b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-8b
-  - model_name: qwen3-vl-30b
+  - model_name: qwen/qwen3-vl-30b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-30b
-  - model_name: qwen3-coder-30b
+  - model_name: qwen/qwen3-coder-30b
     litellm_params:
       model: lm_studio/qwen/qwen3-coder-30b
   - model_name: gemma-3-1b
@@ -70,7 +73,7 @@ model_list:
   - model_name: gemma-3-27b
     litellm_params:
       model: lm_studio/google/gemma-3-27b
-  - model_name: gpt-oss-20b-local
+  - model_name: openai/gpt-oss-20b-local
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
   - model_name: glm-4.6v-flash

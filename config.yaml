@@ -1,53 +1,46 @@
 model_list:
   # OPENROUTER MODELS
-  - model_name: openai/gpt-oss-20b
+  - model_name: openai/gpt-oss-20b-or
     litellm_params:
       model: openrouter/openai/gpt-oss-20b:free
       api_key: "os.environ/OPENROUTER_API_KEY"
       rpm: 18
   # GOOGLE GEMINI MODELS
-  - model_name: gemini-2.5-pro
+  - model_name: google/gemini-2.5-pro
     litellm_params:
       model: gemini/gemini-2.5-pro
       api_key: "os.environ/GEMINI_API_KEY"
       rpm: 2
       tpm: 125000
       rpd: 50
-  - model_name: gemini-2.5-flash
+  - model_name: google/gemini-2.5-flash
     litellm_params:
       model: gemini/gemini-2.5-flash
       api_key: "os.environ/GEMINI_API_KEY"
       rpm: 10
       tpm: 250000
       rpd: 250
-  - model_name: gemini-2.5-flash-lite
+  - model_name: google/gemini-2.5-flash-lite
     litellm_params:
       model: gemini/gemini-2.5-flash-lite
       api_key: "os.environ/GEMINI_API_KEY"
       rpm: 15
       tpm: 250000
       rpd: 1000
-  - model_name: gemini-2.0-flash
+  - model_name: google/gemini-2.0-flash
     litellm_params:
       model: gemini/gemini-2.0-flash
       api_key: "os.environ/GEMINI_API_KEY"
       rpm: 15
       tpm: 1000000
       rpd: 200
-  - model_name: gemini-2.5-flash-tts
+  - model_name: google/gemini-2.5-flash-tts
     litellm_params:
       model: gemini/gemini-2.5-flash-tts
       api_key: "os.environ/GEMINI_API_KEY"
       rpm: 3
       tpm: 10000
       rpd: 15
-  - model_name: gemini-robotics-er-1.5-preview
-    litellm_params:
-      model: gemini/gemini-robotics-er-1.5-preview
-      api_key: "os.environ/GEMINI_API_KEY"
-      rpm: 10
-      tpm: 250000
-      rpd: 250
   # LM STUDIO MODELS
   - model_name: qwen/qwen3-vl-4b
     litellm_params:
@@ -73,15 +66,9 @@ model_list:
   - model_name: gemma-3-27b
     litellm_params:
       model: lm_studio/google/gemma-3-27b
-  - model_name: openai/gpt-oss-20b-local
+  - model_name: openai/gpt-oss-20b
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
-  - model_name: glm-4.6v-flash
-    litellm_params:
-      model: lm_studio/zai-org/glm-4.6v-flash
-  - model_name: ministral-3-14b-reasoning
-    litellm_params:
-      model: lm_studio/mistralai/ministral-3-14b-reasoning
   # GITHUB MODELS
   - model_name: openai/gpt-4o-mini
     litellm_params:
@@ -226,6 +213,16 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+  - model_name: google/gemini-2.5-pro
+    litellm_params:
+      model: github_copilot/gemini-2.5-pro
+      rpm: 10
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
 
 litellm_settings:
   drop_params: true
@@ -234,3 +231,4 @@ litellm_settings:
 
 general_settings:
   master_key: "os.environ/LITELLM_MASTER_KEY"
+  store_model_in_db: true

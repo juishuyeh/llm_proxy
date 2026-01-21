@@ -42,6 +42,12 @@ model_list:
       tpm: 10000
       rpd: 15
   # LM STUDIO MODELS
+  - model_name: qwen/qwen3-1.7b
+    litellm_params:
+      model: lm_studio/qwen/qwen3-1.7b
+  - model_name: qwen/qwen3-14b
+    litellm_params:
+      model: lm_studio/qwen/qwen3-14b
   - model_name: qwen/qwen3-vl-4b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-4b

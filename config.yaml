@@ -75,6 +75,9 @@ model_list:
   - model_name: openai/gpt-oss-20b
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
+  - model_name: zai-org/glm-4.7-flash
+    litellm_params:
+      model: lm_studio/zai-org/glm-4.7-flash
   # GITHUB MODELS
   - model_name: openai/gpt-4o-mini
     litellm_params:

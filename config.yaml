@@ -60,18 +60,12 @@ model_list:
   - model_name: qwen/qwen3-coder-30b
     litellm_params:
       model: lm_studio/qwen/qwen3-coder-30b
-  - model_name: gemma-3-1b
+  - model_name: qwen/qwen3.5-35b-a3b
     litellm_params:
-      model: lm_studio/google/gemma-3-1b
-  - model_name: gemma-3-4b
+      model: lm_studio/qwen3.5-35b-a3b
+  - model_name: qwen/qwen3.5-27b
     litellm_params:
-      model: lm_studio/google/gemma-3-4b
-  - model_name: gemma-3-12b
-    litellm_params:
-      model: lm_studio/google/gemma-3-12b
-  - model_name: gemma-3-27b
-    litellm_params:
-      model: lm_studio/google/gemma-3-27b
+      model: lm_studio/qwen3.5-27b
   - model_name: openai/gpt-oss-20b
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b

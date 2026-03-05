@@ -63,6 +63,9 @@ model_list:
   - model_name: qwen/qwen3.5-0.8b
     litellm_params:
       model: lm_studio/qwen3.5-0.8b-mlx
+  - model_name: qwen/qwen3.5-2b
+    litellm_params:
+      model: lm_studio/qwen3.5-2b-mlx
   - model_name: qwen/qwen3.5-4b
     litellm_params:
       model: lm_studio/qwen3.5-4b-mlx

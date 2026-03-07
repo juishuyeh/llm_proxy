@@ -188,6 +188,16 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+  - model_name: anthropic/claude-sonnet-4.6
+    litellm_params:
+      model: github_copilot/claude-sonnet-4.6
+      rpm: 10
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
   - model_name: anthropic/claude-opus-4.5
     litellm_params:
       model: github_copilot/claude-opus-4.5
@@ -238,6 +248,22 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+
+  # ── LOCAL TTS MODELS ──────────────────────────────────
+  - model_name: local/qwen3-tts
+    litellm_params:
+      model: openai/qwen3-tts
+      api_base: http://host.docker.internal:8020
+      api_key: "dummy"
+    model_info:
+      mode: audio_speech
+  - model_name: local/qwen3-asr
+    litellm_params:
+      model: openai/qwen3-asr
+      api_base: http://host.docker.internal:8030
+      api_key: "dummy"
+    model_info:
+      mode: audio_transcription
 
 litellm_settings:
   drop_params: true

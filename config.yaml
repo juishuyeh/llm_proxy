@@ -248,6 +248,12 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+  # minimax models
+  - model_name: minimax/minimax-m2.5
+    litellm_params:
+      model: minimax/MiniMax-M2.5
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/anthropic/v1/messages
 
   # ── LOCAL TTS MODELS ──────────────────────────────────
   - model_name: local/qwen3-tts

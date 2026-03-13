@@ -84,6 +84,9 @@ model_list:
   - model_name: zai-org/glm-4.7-flash
     litellm_params:
       model: lm_studio/zai-org/glm-4.7-flash
+  - model_name: qwen3-embedding
+    litellm_params:
+      model: lm_studio/text-embedding-qwen3-embedding-0.6b
   # GITHUB MODELS
   - model_name: openai/gpt-4o-mini
     litellm_params:
@@ -250,6 +253,11 @@ model_list:
         Copilot-Vision-Request: "true"
   # minimax models
   - model_name: minimax/minimax-m2.5
+    litellm_params:
+      model: minimax/MiniMax-M2.5
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/v1
+  - model_name: minimax/MiniMax-M2.5-anthropic
     litellm_params:
       model: minimax/MiniMax-M2.5
       api_key: os.environ/MINIMAX_API_KEY

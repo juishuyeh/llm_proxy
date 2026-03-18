@@ -262,6 +262,16 @@ model_list:
       model: minimax/MiniMax-M2.5
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/anthropic/v1/messages
+  - model_name: minimax/minimax-m2.7
+    litellm_params:
+      model: minimax/MiniMax-M2.7
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/v1
+  - model_name: minimax/MiniMax-M2.7-anthropic
+    litellm_params:
+      model: minimax/MiniMax-M2.7
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/anthropic/v1/messages
 
   # ── LOCAL TTS MODELS ──────────────────────────────────
   - model_name: local/qwen3-tts

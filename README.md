@@ -5,12 +5,12 @@
 ## 功能特色
 
 - 🚀 **多模型支援**：整合 5 大 LLM 提供商（OpenRouter、Google Gemini、GitHub Models、GitHub Copilot、LM Studio），支援 33+ 種模型
-- 🔐 **安全管理**：API 金鑰認證、速率限制、Nginx HTTPS 反向代理
+- 🔐 **安全管理**：API 金鑰認證、速率限制
 - 📊 **完整監控**：整合 MLflow 追蹤實驗與 API 請求記錄
 - 🐳 **容器化部署**：使用 Docker Compose 一鍵啟動所有服務
 - 💾 **持久化儲存**：PostgreSQL 資料庫確保資料不遺失
 - 🎯 **資源控制**：預設配置 CPU 和記憶體限制
-- 🌐 **公網部署**：支援 SSL/TLS 加密與 Let's Encrypt 憑證（參見 [NGINX_SETUP.md](NGINX_SETUP.md)）
+- 🌐 **MLflow 認證**：透過 Nginx 反向代理提供 MLflow 基本認證保護
 
 ## 支援的模型
 
@@ -123,7 +123,7 @@ docker compose up -d
 - **LiteLLM Proxy**：AI 模型代理服務（端口 4000）
 - **PostgreSQL**：資料庫服務（端口 5432）
 - **MLflow**：實驗追蹤服務（端口 5001，僅限本機訪問）
-- **Nginx**：HTTPS 反向代理（端口 443/80，需要 SSL 憑證，參見 [NGINX_SETUP.md](NGINX_SETUP.md)）
+- **Nginx**：MLflow 認證代理（端口 5001）
 
 ### 4. 訪問服務
 
@@ -232,7 +232,7 @@ docker compose up -d
 | LiteLLM | 2.0 | 4G | 0.5 | 1G |
 | PostgreSQL | 1.0 | 2G | 0.25 | 512M |
 | MLflow | 1.0 | 2G | 0.25 | 512M |
-| Nginx | 0.5 | 512M | 0.1 | 128M |
+| Nginx (MLflow Auth) | 0.5 | 512M | 0.1 | 128M |
 
 您可以在 `docker-compose.yml` 中調整這些設定以符合您的需求。
 
@@ -242,7 +242,7 @@ docker compose up -d
 
 - **PostgreSQL 資料**：儲存在 `litellm_postgres_data` volume（LiteLLM 和 MLflow 資料庫）
 - **MLflow Artifacts**：儲存在 `mlflow_data` volume（實驗追蹤資料）
-- **Nginx 日誌**：儲存在 `nginx_logs` volume（訪問和錯誤日誌）
+- **Nginx 日誌**：儲存在 `nginx_logs` volume（MLflow 認證代理日誌）
 - **GitHub Copilot 認證**：儲存在 `github_copilot_auth_data` volume（認證快取）
 
 即使容器重啟，這些資料也不會遺失。
@@ -295,7 +295,7 @@ db:
 ### 服務無法啟動
 
 1. 檢查 `.env` 檔案是否正確設定
-2. 確認端口 4000、5001、5432 沒有被佔用（如果使用 Nginx，還需要 80 和 443）
+2. 確認端口 4000、5001、5432 沒有被佔用
 3. 查看服務日誌：`docker compose logs -f`
 
 ### API 呼叫失敗
@@ -318,7 +318,7 @@ db:
 1. 檢查是否超過該提供商的 API 額度限制（詳見[支援的模型](#支援的模型)）
 2. 降低 `config.yaml` 中對應模型的 `rpm`/`tpm`/`rpd` 設定
 3. 等待速率限制重置（通常是 1 分鐘）後重試
-4. 如果使用 Nginx，也可能觸發 IP 限流（預設 100 req/min）
+4. 等待速率限制重置後重試
 
 ## 手動安裝（不使用 Docker）
 
@@ -376,25 +376,12 @@ uv run litellm --config config.yaml --port 4000 --detailed_debug
 ## 技術架構
 
 ```
-                        公網訪問 (選用)
-                             │
-                    ┌────────▼─────────┐
-                    │  Nginx (443/80)  │ ◄─── SSL/TLS 加密
-                    │  - Rate Limiting │      HTTPS 反向代理
-                    │  - Security      │
-                    └────────┬─────────┘
-                             │
-        ┌────────────────────┴───────────────────┐
-        │                                        │
-        │            內網訪問 (預設)              │
-        │                                        │
-        ▼                                        ▼
 ┌───────────────────────────────┐    ┌──────────────────────┐
 │  User / Application           │    │  LiteLLM Web UI      │
 │  - API Clients                │    │  (localhost:4000/ui) │
 │  - Python/Node.js/cURL        │    └──────────────────────┘
 └───────────────┬───────────────┘
-                │ HTTP/HTTPS Requests
+                │ HTTP Requests
                 ▼
 ┌────────────────────────────────────────────────────────────┐
 │          LiteLLM Proxy Service (Port 4000)                 │
@@ -409,16 +396,15 @@ uv run litellm --config config.yaml --port 4000 --detailed_debug
 ┌──────────┐   ┌─────────────┐   ┌─────────────────────────┐
 │ MLflow   │   │ PostgreSQL  │   │  LLM Providers:         │
 │ (5001)   │   │  (5432)     │   │  - OpenRouter           │
-│          │◄──┤  - LiteLLM  │   │  - Google Gemini        │
-│ Tracking │   │  - MLflow   │   │  - GitHub Models        │
-│ Server   │   │             │   │  - GitHub Copilot       │
-└──────────┘   └─────────────┘   │  - LM Studio (本地)      │
-                                 └─────────────────────────┘
+│  ▲       │◄──┤  - LiteLLM  │   │  - Google Gemini        │
+│  │ Nginx │   │  - MLflow   │   │  - GitHub Models        │
+│  │ Auth  │   │             │   │  - GitHub Copilot       │
+│  │ Proxy │   └─────────────┘   │  - LM Studio (本地)      │
+└──────────┘                     └─────────────────────────┘
 
 持久化儲存 (Docker Volumes):
   - postgres_data: 資料庫資料
   - mlflow_data: MLflow artifacts
-  - nginx_logs: Nginx 日誌
   - github_copilot_auth_data: Copilot 認證快取
 ```
 

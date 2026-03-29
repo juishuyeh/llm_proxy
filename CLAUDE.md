@@ -27,21 +27,21 @@ This is a **LiteLLM-based AI model proxy service** that provides:
 - **Multi-Model Support**: Access to OpenRouter, Google Gemini, GitHub Models, GitHub Copilot, and local LM Studio models
 - **Monitoring & Tracking**: MLflow integration for experiment tracking and metrics
 - **Rate Limiting**: Built-in rate limiting to respect API quotas
-- **Production Deployment**: Docker Compose orchestration with Nginx reverse proxy and SSL/TLS support
+- **Production Deployment**: Docker Compose orchestration
 
 ### Technology Stack
 
 - **Core**: LiteLLM (Python-based LLM proxy)
 - **Database**: PostgreSQL 16 (stores proxy metadata and MLflow data)
 - **Monitoring**: MLflow 3.8.0 (experiment tracking)
-- **Reverse Proxy**: Nginx (HTTPS termination, rate limiting)
+- **Auth Proxy**: Nginx (basic auth proxy for MLflow)
 - **Containerization**: Docker & Docker Compose
 - **Python**: 3.13+ (managed via pyproject.toml)
 
-### Current State (as of 2026-01-07)
+### Current State (as of 2026-03-29)
 
-- **Branch**: `claude/add-claude-documentation-rBkmr`
-- **Recent Commits**: Model configuration updates, GitHub RPM adjustments, Dockerfile and MLflow path fixes
+- **Branch**: `main`
+- **Recent Commits**: Model configuration updates, Dockerfile and MLflow version updates
 - **Status**: Clean working tree
 
 ---
@@ -54,15 +54,7 @@ This is a **LiteLLM-based AI model proxy service** that provides:
 ┌─────────────────────────────────────────────────────────┐
 │                   User / Application                    │
 └───────────────────┬─────────────────────────────────────┘
-                    │ HTTPS (Public) / HTTP (Internal)
-                    ▼
-┌─────────────────────────────────────────────────────────┐
-│          Nginx Reverse Proxy (Optional)                 │
-│  - SSL/TLS Termination (Port 443)                       │
-│  - Rate Limiting (100 req/min default)                  │
-│  - Security Headers (HSTS, X-Frame-Options)             │
-└───────────────────┬─────────────────────────────────────┘
-                    │ HTTP (Docker network)
+                    │ HTTP (Port 4000)
                     ▼
 ┌─────────────────────────────────────────────────────────┐
 │          LiteLLM Proxy Service (Port 4000)              │
@@ -76,13 +68,23 @@ This is a **LiteLLM-based AI model proxy service** that provides:
     ▼                 ▼                   ▼
 ┌──────────┐    ┌──────────┐      ┌──────────────────┐
 │ MLflow   │    │PostgreSQL│      │  LLM Providers:  │
-│(Port 5001│◄───┤(Port 5432│      │  - OpenRouter    │
+│(Port 5000│◄───┤(Port 5432│      │  - OpenRouter    │
 │          │    │          │      │  - Google Gemini │
 │          │    │          │      │  - GitHub Models │
-└──────────┘    └──────────┘      │  - GitHub Copilot│
-                                  │  - LM Studio     │
-                                  └──────────────────┘
+└────┬─────┘    └──────────┘      │  - GitHub Copilot│
+     │                            │  - LM Studio     │
+     │ Nginx Auth Proxy           └──────────────────┘
+     │ (Port 5001, basic auth)
+     ▼
+┌──────────┐
+│  Nginx   │
+│(Port 5001│
+│  basic   │
+│  auth)   │
+└──────────┘
 ```
+
+Note: Nginx serves only as a basic auth proxy for MLflow on port 5001. Users connect directly to LiteLLM on port 4000.
 
 ### Service Dependencies
 
@@ -90,20 +92,18 @@ This is a **LiteLLM-based AI model proxy service** that provides:
 db (PostgreSQL)
   ↓ depends_on
 mlflow
-  ↓ depends_on
-litellm
-  ↓ depends_on (optional)
-nginx
+  ↓ depends_on        ↓ depends_on
+litellm              nginx (MLflow auth proxy)
 ```
 
 ### Data Flow
 
-1. **Request**: Client → Nginx (HTTPS) → LiteLLM (HTTP)
+1. **Request**: Client → LiteLLM (HTTP, Port 4000)
 2. **Authentication**: LiteLLM validates `LITELLM_MASTER_KEY`
 3. **Routing**: LiteLLM selects appropriate model/provider based on `model` parameter
-4. **Rate Limiting**: Both Nginx (IP-based) and LiteLLM (model-specific RPM) enforce limits
+4. **Rate Limiting**: LiteLLM enforces model-specific RPM limits
 5. **Logging**: Request/response logged to MLflow and PostgreSQL
-6. **Response**: LLM Provider → LiteLLM → Nginx → Client
+6. **Response**: LLM Provider → LiteLLM → Client
 
 ---
 
@@ -119,7 +119,6 @@ llm_proxy/
 ├── .dockerignore               # Docker build ignore patterns
 │
 ├── README.md                   # Main project documentation (Chinese)
-├── NGINX_SETUP.md              # Nginx deployment guide (Chinese)
 ├── CLAUDE.md                   # This file - AI assistant guide
 │
 ├── config.yaml                 # LiteLLM model configuration ⭐
@@ -131,13 +130,7 @@ llm_proxy/
 ├── docker-compose.yml          # Service orchestration ⭐
 ├── init-db.sql                 # PostgreSQL initialization
 │
-├── nginx.conf.example          # Nginx configuration template
-├── nginx.conf                  # Nginx configuration (gitignored)
-│
-└── ssl/                        # SSL certificates (gitignored)
-    ├── cert.pem               # SSL certificate
-    ├── key.pem                # SSL private key
-    └── .htpasswd              # Basic auth (optional)
+├── .htpasswd                   # MLflow basic auth credentials (gitignored)
 ```
 
 ### Important Files for AI Assistants
@@ -148,14 +141,12 @@ llm_proxy/
 | `docker-compose.yml` | Service definitions, resource limits | Medium |
 | `.env.example` | Environment variable documentation | Low |
 | `README.md` | User-facing documentation | Medium |
-| `NGINX_SETUP.md` | Deployment documentation | Low |
-| `nginx.conf.example` | Nginx template | Low |
+| `.htpasswd` | MLflow basic auth credentials | Low |
 
 ### Files Never to Modify
 
 - `.env` - User-specific secrets (gitignored)
-- `nginx.conf` - User-specific configuration (gitignored)
-- `ssl/*` - SSL certificates (gitignored)
+- `.htpasswd` - MLflow basic auth credentials (gitignored)
 - `uv.lock` - Auto-generated (gitignored)
 
 ---
@@ -201,10 +192,11 @@ general_settings:
 
 **Services**:
 
-1. **nginx** (optional):
-   - Ports: 443 (HTTPS), 80 (HTTP redirect)
-   - Volumes: `nginx.conf`, `ssl/`, `nginx_logs`
+1. **nginx** (MLflow auth proxy):
+   - Ports: 5001:80
+   - Volumes: `.htpasswd`
    - Resources: 0.5 CPU / 512M RAM
+   - Depends on: `mlflow`
 
 2. **litellm**:
    - Build: `Dockerfile`
@@ -223,7 +215,7 @@ general_settings:
 
 4. **mlflow**:
    - Build: `Dockerfile.mlflow`
-   - Ports: 127.0.0.1:5001:5000 (localhost only)
+   - Port: 5000 (internal, accessed via Nginx auth proxy on port 5001)
    - Volumes: `mlflow_data`
    - Command: MLflow server with PostgreSQL backend
    - Resources: 1.0 CPU / 2G RAM
@@ -232,7 +224,6 @@ general_settings:
 **Volumes**:
 - `postgres_data` - PostgreSQL database persistence
 - `mlflow_data` - MLflow artifacts and experiments
-- `nginx_logs` - Nginx access/error logs
 - `github_copilot_auth_data` - GitHub Copilot authentication cache
 
 ### .env.example
@@ -521,24 +512,15 @@ docker compose logs -f -t litellm
 
 2. **Monitor with MLflow**: Check actual request rates via MLflow dashboard
 
-3. **Nginx rate limiting**: Provides additional IP-based protection
-   - Default: 100 req/min per IP
-   - Configured in `nginx.conf`
-
-4. **Burst handling**: Allows short bursts above limit
-   ```nginx
-   limit_req zone=api_limit burst=20 nodelay;
-   ```
-
 ---
 
 ## Deployment
 
-### Local Development (Internal Network Only)
+### Local Development
 
 ```bash
-# Start services without Nginx
-docker compose up -d db mlflow litellm
+# Start all services
+docker compose up -d
 
 # Access via localhost
 curl http://localhost:4000/health/liveliness
@@ -546,105 +528,9 @@ curl http://localhost:4000/health/liveliness
 
 **Use cases**:
 - Development and testing
-- Internal network only
-- No HTTPS required
-
-### Production Deployment (Public Internet)
-
-#### Prerequisites
-
-1. **SSL Certificate**: Obtain from Let's Encrypt or use Synology Router certificate
-2. **Domain Name**: e.g., `your-domain.synology.me`
-3. **Port Forwarding**: Configure router to forward external port (e.g., 45000) to Docker host port 443
-
-#### Setup Steps
-
-1. **Prepare SSL certificates**:
-   ```bash
-   mkdir -p ssl
-   cp /path/to/server.crt ssl/cert.pem
-   cp /path/to/server.key ssl/key.pem
-   chmod 600 ssl/key.pem
-   ```
-
-2. **Configure Nginx**:
-   ```bash
-   cp nginx.conf.example nginx.conf
-   # Edit nginx.conf and replace 'your-domain.synology.me' with actual domain
-   sed -i 's/your-domain.synology.me/yourdomain.example.com/g' nginx.conf
-   ```
-
-3. **Start all services**:
-   ```bash
-   docker compose up -d
-   ```
-
-4. **Verify**:
-   ```bash
-   # Local HTTPS
-   curl -k https://localhost/health/liveliness
-
-   # Public HTTPS
-   curl https://yourdomain.example.com:45000/health/liveliness
-   ```
-
-### Nginx Configuration Details
-
-**Key features** (defined in `nginx.conf.example`):
-
-1. **SSL/TLS**:
-   - Protocols: TLS 1.2, TLS 1.3
-   - Strong ciphers only
-   - HSTS enabled (max-age: 1 year)
-
-2. **Rate Limiting**:
-   - 100 requests/minute per IP
-   - Burst: 20 additional requests
-   - Returns HTTP 429 when exceeded
-
-3. **Security Headers**:
-   - `Strict-Transport-Security`
-   - `X-Frame-Options: SAMEORIGIN`
-   - `X-Content-Type-Options: nosniff`
-   - `X-XSS-Protection: 1; mode=block`
-
-4. **HTTP to HTTPS Redirect**:
-   - Port 80 redirects to port 443
-   - Health check endpoint accessible via HTTP
-
-5. **Reverse Proxy**:
-   - Forwards to `litellm:4000` backend
-   - Preserves client IP via `X-Real-IP` and `X-Forwarded-For`
-   - WebSocket support enabled
-
-### Customizing Nginx
-
-**Adjust rate limit**:
-```nginx
-# Line 23 in nginx.conf
-limit_req_zone $binary_remote_addr zone=api_limit:10m rate=500r/m;
-```
-
-**Add IP whitelist**:
-```nginx
-location / {
-    allow 192.168.1.0/24;
-    allow 203.0.113.45;
-    deny all;
-
-    # ... rest of config
-}
-```
-
-**Enable basic authentication**:
-```bash
-# Create password file
-docker run --rm httpd:alpine htpasswd -nb admin password > ssl/.htpasswd
-
-# Add to nginx.conf location /
-auth_basic "LLM Proxy";
-auth_basic_user_file /etc/nginx/ssl/.htpasswd;
-```
+- Production deployment
+- Access LiteLLM directly on port 4000
+- Access MLflow UI via Nginx auth proxy on port 5001
 
 ---
 
@@ -703,21 +589,6 @@ print(response.choices[0].message.content)
 2. **Check experiments**: Look for `litellm-local-experiment`
 3. **View metrics**: Request counts, latencies, errors
 
-### Test Rate Limiting
-
-```bash
-# Send rapid requests to trigger rate limit
-for i in {1..25}; do
-  curl -X POST http://localhost:4000/v1/chat/completions \
-    -H "Authorization: Bearer $LITELLM_MASTER_KEY" \
-    -H "Content-Type: application/json" \
-    -d '{"model": "google/gemini-2.5-flash", "messages": [{"role": "user", "content": "Hi"}]}'
-  echo "Request $i"
-done
-```
-
-**Expected**: Some requests will return HTTP 429 after exceeding RPM limit
-
 ---
 
 ## Common Tasks
@@ -756,8 +627,7 @@ mkdir -p backups
 tar -czf backups/config-$(date +%Y%m%d).tar.gz \
   config.yaml \
   docker-compose.yml \
-  .env.example \
-  nginx.conf.example
+  .env.example
 
 # Backup PostgreSQL database
 docker compose exec -T db pg_dump -U llmproxy litellm > backups/litellm-$(date +%Y%m%d).sql
@@ -827,18 +697,6 @@ docker system df
 
 # PostgreSQL database size
 docker compose exec db psql -U llmproxy -d litellm -c "SELECT pg_size_pretty(pg_database_size('litellm'));"
-```
-
-### Rotate Logs
-
-```bash
-# Nginx logs
-docker compose exec nginx sh -c "echo > /var/log/nginx/access.log"
-docker compose exec nginx sh -c "echo > /var/log/nginx/error.log"
-
-# Or truncate from host (if using volume mount)
-> nginx_logs/access.log
-> nginx_logs/error.log
 ```
 
 ### Add a New LLM Provider
@@ -922,17 +780,12 @@ docker compose exec nginx sh -c "echo > /var/log/nginx/error.log"
    - Getting started guide
    - Common troubleshooting
 
-2. **NGINX_SETUP.md** (Chinese):
-   - Production deployment guide
-   - SSL/TLS configuration
-   - Security best practices
-
-3. **CLAUDE.md** (English):
+2. **CLAUDE.md** (English):
    - This file - AI assistant guidance
    - Architecture and internals
    - Development workflows
 
-4. **Inline Comments**:
+3. **Inline Comments**:
    - Use Chinese for user-facing configs (config.yaml, docker-compose.yml)
    - Use English for code comments
    - Explain "why", not "what"
@@ -951,8 +804,7 @@ docker compose exec nginx sh -c "echo > /var/log/nginx/error.log"
 
 3. **Files to Never Commit**:
    - `.env` (secrets)
-   - `nginx.conf` (user-specific)
-   - `ssl/*` (certificates)
+   - `.htpasswd` (MLflow auth credentials)
    - `uv.lock` (auto-generated)
    - `*_data/` (Docker volumes)
 
@@ -970,21 +822,13 @@ docker compose exec nginx sh -c "echo > /var/log/nginx/error.log"
    - Rotate API keys periodically
 
 2. **Network Security**:
-   - Use HTTPS for public access
-   - Enable Nginx rate limiting
+   - Protect MLflow UI with basic auth via Nginx proxy (port 5001)
    - Consider IP whitelisting for sensitive deployments
-   - Bind MLflow to localhost only (127.0.0.1:5001)
 
 3. **Database Security**:
    - Use strong PostgreSQL passwords
    - Optionally remove port 5432 exposure if no external access needed
    - Regular backups
-
-4. **SSL/TLS**:
-   - Use TLS 1.2+ only
-   - Strong cipher suites
-   - Enable HSTS
-   - Regular certificate renewal (Let's Encrypt renews every 90 days)
 
 ### Performance
 
@@ -992,17 +836,15 @@ docker compose exec nginx sh -c "echo > /var/log/nginx/error.log"
    - Check `docker stats` regularly
    - Monitor PostgreSQL database size
    - Watch MLflow artifact storage growth
-   - Review Nginx access logs for traffic patterns
 
 2. **Optimization**:
    - Adjust Docker resource limits based on actual usage
-   - Use Nginx caching for static content if needed
    - Consider PostgreSQL connection pooling for high traffic
    - Implement log rotation to prevent disk fill
 
 3. **Scaling**:
    - Vertical: Increase CPU/memory limits in docker-compose.yml
-   - Horizontal: Add multiple LiteLLM instances behind Nginx load balancer
+   - Horizontal: Add multiple LiteLLM instances with load balancing
    - Database: Consider read replicas for MLflow queries
 
 ---
@@ -1021,7 +863,7 @@ docker compose exec nginx sh -c "echo > /var/log/nginx/error.log"
 docker compose logs
 
 # Check for port conflicts
-lsof -i :4000 -i :5432 -i :5001 -i :443
+lsof -i :4000 -i :5432 -i :5001
 
 # Verify .env file exists and is valid
 cat .env | grep -v '^#' | grep -v '^$'
@@ -1069,39 +911,16 @@ curl http://localhost:4000/v1/models \
 **Symptoms**: Requests fail with HTTP 429
 
 **Identify source**:
-- **Nginx**: `{"error": "Too Many Requests"}` in response
 - **LiteLLM**: "Rate limit exceeded for model X" in response
 - **Provider**: Provider-specific error message
 
 **Solutions**:
 ```bash
-# Check Nginx rate limit (nginx.conf line 23)
-grep limit_req_zone nginx.conf
-
 # Check model RPM limit (config.yaml)
 grep -A 3 "model_name: google/gemini-2.5-flash" config.yaml
 
 # View recent requests in logs
 docker compose logs litellm --tail=100 | grep "429"
-```
-
-#### 5. SSL Certificate Errors
-
-**Symptoms**: HTTPS connections fail
-
-**Solutions**:
-```bash
-# Verify certificate files exist
-ls -lh ssl/cert.pem ssl/key.pem
-
-# Check certificate validity
-openssl x509 -in ssl/cert.pem -noout -dates -subject
-
-# Verify Nginx loaded certificate
-docker compose logs nginx | grep -i ssl
-
-# Test certificate
-curl -v https://localhost:443 2>&1 | grep -i certificate
 ```
 
 ---
@@ -1114,13 +933,11 @@ curl -v https://localhost:443 2>&1 | grep -i certificate
 - **LiteLLM Providers**: https://docs.litellm.ai/docs/providers
 - **MLflow**: https://mlflow.org/docs/latest/index.html
 - **PostgreSQL**: https://www.postgresql.org/docs/16/
-- **Nginx**: https://nginx.org/en/docs/
 - **Docker Compose**: https://docs.docker.com/compose/
 
 ### Internal Documentation
 
 - **README.md**: User guide and quick start (Chinese)
-- **NGINX_SETUP.md**: Production deployment with HTTPS (Chinese)
 - **.env.example**: Environment variable reference
 
 ### Useful Commands Reference
@@ -1178,7 +995,6 @@ curl http://localhost:4000/v1/models -H "Authorization: Bearer $LITELLM_MASTER_K
    - Never commit .env file
    - Never log API keys
    - Always validate user input
-   - Use HTTPS for production
 
 7. **Be explicit in commit messages**:
    - Explain what changed and why
@@ -1193,7 +1009,7 @@ curl http://localhost:4000/v1/models -H "Authorization: Bearer $LITELLM_MASTER_K
 
 ---
 
-**Document Version**: 1.0.0
-**Last Updated**: 2026-01-07
+**Document Version**: 1.1.0
+**Last Updated**: 2026-03-29
 **Maintained By**: AI Assistants working on this codebase
 **Contact**: See repository issues for questions

@@ -92,6 +92,10 @@ services:
       - "5000"
     volumes:
       - mlflow_data:/mlflow/mlruns
+    environment:
+      # 允許來自外部反向代理 domain 的跨來源 POST 請求（MLflow CORSBlockingMiddleware）
+      # 預設只允許 localhost，透過 Cloudflare Tunnel 等反向代理存取時需設定此變數
+      MLFLOW_SERVER_CORS_ALLOWED_ORIGINS: "https://${MLFLOW_EXTRA_HOSTS}"
     command:
       - mlflow
       - server

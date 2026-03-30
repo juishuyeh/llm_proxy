@@ -288,6 +288,21 @@ model_list:
       api_key: "dummy"
     model_info:
       mode: audio_transcription
+  # omlx provided models
+  - model_name: omlx/qwen3-asr-1.7b
+    litellm_params:
+      model: openai/Qwen3-ASR-1.7B
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      mode: audio_transcription
+  - model_name: omlx/qwen3-tts-12hz-1.7b-voicedesign
+    litellm_params:
+      model: openai/Qwen3-TTS-12Hz-1.7B-VoiceDesign
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      mode: audio_speech
 
 litellm_settings:
   drop_params: true

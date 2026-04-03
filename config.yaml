@@ -42,27 +42,12 @@ model_list:
       tpm: 10000
       rpd: 15
   # LM STUDIO MODELS
-  - model_name: qwen/qwen3-1.7b
-    litellm_params:
-      model: lm_studio/qwen/qwen3-1.7b
-  - model_name: qwen/qwen3-14b
-    litellm_params:
-      model: lm_studio/qwen/qwen3-14b
-  - model_name: qwen/qwen3-vl-4b
-    litellm_params:
-      model: lm_studio/qwen/qwen3-vl-4b
   - model_name: qwen/qwen3-vl-8b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-8b
   - model_name: qwen/qwen3-vl-30b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-30b
-  - model_name: qwen/qwen3-coder-30b
-    litellm_params:
-      model: lm_studio/qwen/qwen3-coder-30b
-  - model_name: qwen/qwen3.5-0.8b
-    litellm_params:
-      model: lm_studio/qwen3.5-0.8b-mlx
   - model_name: qwen/qwen3.5-2b
     litellm_params:
       model: lm_studio/qwen3.5-2b-mlx
@@ -81,9 +66,6 @@ model_list:
   - model_name: openai/gpt-oss-20b
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
-  - model_name: zai-org/glm-4.7-flash
-    litellm_params:
-      model: lm_studio/zai-org/glm-4.7-flash
   - model_name: qwen3-embedding
     litellm_params:
       model: lm_studio/text-embedding-qwen3-embedding-0.6b
@@ -272,22 +254,6 @@ model_list:
       model: minimax/MiniMax-M2.7
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/anthropic/v1/messages
-
-  # ── LOCAL TTS MODELS ──────────────────────────────────
-  - model_name: local/qwen3-tts
-    litellm_params:
-      model: openai/qwen3-tts
-      api_base: http://host.docker.internal:8020
-      api_key: "dummy"
-    model_info:
-      mode: audio_speech
-  - model_name: local/qwen3-asr
-    litellm_params:
-      model: openai/qwen3-asr
-      api_base: http://host.docker.internal:8030
-      api_key: "dummy"
-    model_info:
-      mode: audio_transcription
   # omlx provided models
   - model_name: omlx/qwen3-asr-1.7b
     litellm_params:
@@ -303,6 +269,18 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_speech
+  - model_name: omlx/qwen3-tts-12hz-1.7b-customvoice
+    litellm_params:
+      model: openai/Qwen3-TTS-12Hz-1.7B-CustomVoice
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      mode: audio_speech
+  - model_name: omlx/qwen3.5-27b-distilled
+    litellm_params:
+      model: openai/Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
 
 litellm_settings:
   drop_params: true

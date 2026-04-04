@@ -255,6 +255,14 @@ model_list:
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/anthropic/v1/messages
   # omlx provided models
+  # ASR models
+  - model_name: omlx/qwen3-asr-0.6b
+    litellm_params:
+      model: openai/Qwen3-ASR-0.6B
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      mode: audio_transcription
   - model_name: omlx/qwen3-asr-1.7b
     litellm_params:
       model: openai/Qwen3-ASR-1.7B
@@ -262,6 +270,21 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_transcription
+  - model_name: omlx/whisper-large-v3-turbo
+    litellm_params:
+      model: openai/whisper-large-v3-turbo
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      mode: audio_transcription
+  # TTS models
+  - model_name: omlx/qwen3-tts-12hz-1.7b-base
+    litellm_params:
+      model: openai/Qwen3-TTS-12Hz-1.7B-Base
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      mode: audio_speech
   - model_name: omlx/qwen3-tts-12hz-1.7b-voicedesign
     litellm_params:
       model: openai/Qwen3-TTS-12Hz-1.7B-VoiceDesign
@@ -276,9 +299,88 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_speech
+  # VL / Chat models
+  - model_name: omlx/qwen3-vl-8b
+    litellm_params:
+      model: openai/Qwen3-VL-8B-Instruct-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3-vl-30b-a3b
+    litellm_params:
+      model: openai/Qwen3-VL-30B-A3B-Instruct-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3.5-2b
+    litellm_params:
+      model: openai/Qwen3.5-2B-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3.5-4b
+    litellm_params:
+      model: openai/Qwen3.5-4B-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3.5-9b
+    litellm_params:
+      model: openai/Qwen3.5-9B-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3.5-27b
+    litellm_params:
+      model: openai/Qwen3.5-27B-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
   - model_name: omlx/qwen3.5-27b-distilled
     litellm_params:
       model: openai/Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3.5-35b-a3b
+    litellm_params:
+      model: openai/Qwen3.5-35B-A3B-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/gpt-oss-20b
+    litellm_params:
+      model: openai/gpt-oss-20b-MXFP4-Q8
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/gemma-4-26b-a4b
+    litellm_params:
+      model: openai/gemma-4-26b-a4b-it-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/gemma-4-31b
+    litellm_params:
+      model: openai/gemma-4-31b-it-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/gemma-4-e2b
+    litellm_params:
+      model: openai/gemma-4-e2b-it-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+      skip_model_validation: true
+    model_info:
+      supports_vision: true
+      supports_audio_input: true
+  - model_name: omlx/gemma-4-e4b
+    litellm_params:
+      model: openai/gemma-4-e4b-it-4bit
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      supports_vision: true
+      supports_audio_input: true
+  # Special / utility models
+  - model_name: omlx/qwen3-forced-aligner-0.6b
+    litellm_params:
+      model: openai/Qwen3-ForcedAligner-0.6B
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/qwen3-tts-tokenizer-12hz
+    litellm_params:
+      model: openai/Qwen3-TTS-Tokenizer-12Hz
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
 

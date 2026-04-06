@@ -355,12 +355,16 @@ model_list:
       model: openai/gemma-4-31b-it-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
+  - model_name: omlx/gemma-4-31b-crack
+    litellm_params:
+      model: openai/Gemma-4-31B-JANG_4M-CRACK
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
   - model_name: omlx/gemma-4-e2b
     litellm_params:
       model: openai/gemma-4-e2b-it-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
-      skip_model_validation: true
     model_info:
       supports_vision: true
       supports_audio_input: true

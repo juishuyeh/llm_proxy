@@ -1,10 +1,4 @@
 model_list:
-  # OPENROUTER MODELS
-  - model_name: openai/gpt-oss-20b-or
-    litellm_params:
-      model: openrouter/openai/gpt-oss-20b:free
-      api_key: "os.environ/OPENROUTER_API_KEY"
-      rpm: 18
   # GOOGLE GEMINI MODELS
   - model_name: google/gemini-2.5-pro
     litellm_params:
@@ -13,6 +7,16 @@ model_list:
       rpm: 2
       tpm: 125000
       rpd: 50
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 65536
+      input_cost_per_token: 0.00000125
+      input_cost_per_token_above_200k_tokens: 0.0000025
+      output_cost_per_token: 0.00001
+      output_cost_per_token_above_200k_tokens: 0.000015
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-2.5-flash
     litellm_params:
       model: gemini/gemini-2.5-flash
@@ -20,6 +24,14 @@ model_list:
       rpm: 10
       tpm: 250000
       rpd: 250
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 65536
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000025
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-2.5-flash-lite
     litellm_params:
       model: gemini/gemini-2.5-flash-lite
@@ -27,6 +39,14 @@ model_list:
       rpm: 15
       tpm: 250000
       rpd: 1000
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 65536
+      input_cost_per_token: 0.0000001
+      output_cost_per_token: 0.0000004
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-2.0-flash
     litellm_params:
       model: gemini/gemini-2.0-flash
@@ -34,6 +54,14 @@ model_list:
       rpm: 15
       tpm: 1000000
       rpd: 200
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 8192
+      input_cost_per_token: 0.0000001
+      output_cost_per_token: 0.0000004
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-2.5-flash-tts
     litellm_params:
       model: gemini/gemini-2.5-flash-tts
@@ -41,60 +69,136 @@ model_list:
       rpm: 3
       tpm: 10000
       rpd: 15
+    model_info:
+      mode: audio_speech
+
   # LM STUDIO MODELS
   - model_name: qwen/qwen3-vl-8b
     litellm_params:
       model: lm_studio/qwen/qwen3-vl-8b
-  - model_name: qwen/qwen3-vl-30b
-    litellm_params:
-      model: lm_studio/qwen/qwen3-vl-30b
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: qwen/qwen3.5-2b
     litellm_params:
       model: lm_studio/qwen3.5-2b-mlx
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: qwen/qwen3.5-4b
     litellm_params:
       model: lm_studio/qwen3.5-4b-mlx
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: qwen/qwen3.5-9b
     litellm_params:
       model: lm_studio/qwen3.5-9b-mlx
-  - model_name: qwen/qwen3.5-27b
-    litellm_params:
-      model: lm_studio/qwen3.5-27b
-  - model_name: qwen/qwen3.5-35b-a3b
-    litellm_params:
-      model: lm_studio/qwen3.5-35b-a3b
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: openai/gpt-oss-20b
     litellm_params:
       model: lm_studio/openai/gpt-oss-20b
+    model_info:
+      max_input_tokens: 131072
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: qwen3-embedding
     litellm_params:
       model: lm_studio/text-embedding-qwen3-embedding-0.6b
+    model_info:
+      mode: embedding
+      max_input_tokens: 32768
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   # GITHUB MODELS
   - model_name: openai/gpt-4o-mini
     litellm_params:
       model: github/gpt-4o-mini
       api_key: "os.environ/GITHUB_API_KEY"
       rpm: 2
+    model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-4.1
     litellm_params:
       model: github/gpt-4.1
       api_key: "os.environ/GITHUB_API_KEY"
       rpm: 2
+    model_info:
+      max_input_tokens: 1000000
+      max_output_tokens: 32768
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-4o
     litellm_params:
       model: github/gpt-4o
       api_key: "os.environ/GITHUB_API_KEY"
       rpm: 2
+    model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-5-mini
     litellm_params:
       model: github/gpt-5-mini
       api_key: "os.environ/GITHUB_API_KEY"
       rpm: 2
+    model_info:
+      max_input_tokens: 400000
+      max_output_tokens: 65536
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-5
     litellm_params:
       model: github/gpt-5
       api_key: "os.environ/GITHUB_API_KEY"
       rpm: 2
+    model_info:
+      max_input_tokens: 400000
+      max_output_tokens: 128000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   # GITHUB COPILOT MODELS
   - model_name: openai/gpt-4o-mini
     litellm_params:
@@ -105,6 +209,14 @@ model_list:
         editor-plugin-version: "copilot/1.155.0"
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
+    model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-4.1
     litellm_params:
       model: github_copilot/gpt-4.1-2025-04-14
@@ -115,6 +227,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 1000000
+      max_output_tokens: 32768
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-4o
     litellm_params:
       model: github_copilot/gpt-4o-2024-11-20
@@ -125,6 +245,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-5-mini
     litellm_params:
       model: github_copilot/gpt-5-mini
@@ -135,6 +263,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 400000
+      max_output_tokens: 65536
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: openai/gpt-5
     litellm_params:
       model: github_copilot/gpt-5
@@ -145,6 +281,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 400000
+      max_output_tokens: 128000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: x-ai/grok-code-fast-1
     litellm_params:
       model: github_copilot/grok-code-fast-1
@@ -154,6 +298,13 @@ model_list:
         editor-plugin-version: "copilot/1.155.0"
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
+    model_info:
+      max_input_tokens: 131072
+      max_output_tokens: 32768
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: raptor-mini
     litellm_params:
       model: github_copilot/raptor-mini
@@ -163,6 +314,13 @@ model_list:
         editor-plugin-version: "copilot/1.155.0"
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
+    model_info:
+      max_input_tokens: 131072
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: anthropic/claude-sonnet-4.5
     litellm_params:
       model: github_copilot/claude-sonnet-4.5
@@ -173,6 +331,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 200000
+      max_output_tokens: 64000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: anthropic/claude-sonnet-4.6
     litellm_params:
       model: github_copilot/claude-sonnet-4.6
@@ -183,6 +349,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 1000000
+      max_output_tokens: 64000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: anthropic/claude-opus-4.5
     litellm_params:
       model: github_copilot/claude-opus-4.5
@@ -193,6 +367,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 200000
+      max_output_tokens: 32768
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: anthropic/claude-haiku-4.5
     litellm_params:
       model: github_copilot/claude-haiku-4.5
@@ -203,6 +385,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 200000
+      max_output_tokens: 64000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-3-pro-preview
     litellm_params:
       model: github_copilot/gemini-3-pro-preview
@@ -213,6 +403,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 65536
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-3-flash-preview
     litellm_params:
       model: github_copilot/gemini-3-flash-preview
@@ -223,6 +421,14 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 65536
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: google/gemini-2.5-pro
     litellm_params:
       model: github_copilot/gemini-2.5-pro
@@ -233,38 +439,90 @@ model_list:
         Copilot-Integration-Id: "vscode-chat"
         user-agent: "GithubCopilot/1.155.0"
         Copilot-Vision-Request: "true"
-  # minimax models
+    model_info:
+      max_input_tokens: 1048576
+      max_output_tokens: 65536
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
+  # MINIMAX MODELS
+  # MiniMax-M2.5: context 196608, output 65536, $0.118/M input, $0.99/M output
   - model_name: minimax/MiniMax-M2.5
     litellm_params:
       model: minimax/MiniMax-M2.5
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/v1
+    model_info:
+      max_input_tokens: 196608
+      max_output_tokens: 65536
+      input_cost_per_token: 0.000000118
+      output_cost_per_token: 0.00000099
+      supports_function_calling: true
+
+  # MiniMax-M2.7: context 204800, output 131072, $0.30/M input, $1.20/M output
   - model_name: minimax/MiniMax-M2.7
     litellm_params:
       model: minimax/MiniMax-M2.7
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/v1
+    model_info:
+      max_input_tokens: 204800
+      max_output_tokens: 131072
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      supports_function_calling: true
+
   - model_name: minimax/minimax-m2.5
     litellm_params:
       model: minimax/MiniMax-M2.5
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/v1
+    model_info:
+      max_input_tokens: 196608
+      max_output_tokens: 65536
+      input_cost_per_token: 0.000000118
+      output_cost_per_token: 0.00000099
+      supports_function_calling: true
+
   - model_name: minimax/MiniMax-M2.5-anthropic
     litellm_params:
       model: minimax/MiniMax-M2.5
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/anthropic/v1/messages
+    model_info:
+      max_input_tokens: 196608
+      max_output_tokens: 65536
+      input_cost_per_token: 0.000000118
+      output_cost_per_token: 0.00000099
+      supports_function_calling: true
+
   - model_name: minimax/minimax-m2.7
     litellm_params:
       model: minimax/MiniMax-M2.7
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/v1
+    model_info:
+      max_input_tokens: 204800
+      max_output_tokens: 131072
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      supports_function_calling: true
+
   - model_name: minimax/MiniMax-M2.7-anthropic
     litellm_params:
       model: minimax/MiniMax-M2.7
       api_key: os.environ/MINIMAX_API_KEY
       api_base: https://api.minimax.io/anthropic/v1/messages
-  # omlx provided models
+    model_info:
+      max_input_tokens: 204800
+      max_output_tokens: 131072
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      supports_function_calling: true
+
+  # OMLX PROVIDED MODELS
   # ASR models
   - model_name: omlx/qwen3-asr-0.6b
     litellm_params:
@@ -273,6 +531,9 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_transcription
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   - model_name: omlx/qwen3-asr-1.7b
     litellm_params:
       model: openai/Qwen3-ASR-1.7B
@@ -280,6 +541,9 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_transcription
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   - model_name: omlx/whisper-large-v3-turbo
     litellm_params:
       model: openai/whisper-large-v3-turbo
@@ -287,6 +551,9 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_transcription
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   # TTS models
   - model_name: omlx/qwen3-tts-12hz-1.7b-base
     litellm_params:
@@ -295,6 +562,9 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_speech
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   - model_name: omlx/qwen3-tts-12hz-1.7b-voicedesign
     litellm_params:
       model: openai/Qwen3-TTS-12Hz-1.7B-VoiceDesign
@@ -302,6 +572,9 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_speech
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   - model_name: omlx/qwen3-tts-12hz-1.7b-customvoice
     litellm_params:
       model: openai/Qwen3-TTS-12Hz-1.7B-CustomVoice
@@ -309,89 +582,119 @@ model_list:
       api_key: os.environ/OMLX_API_KEY
     model_info:
       mode: audio_speech
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
   # VL / Chat models
   - model_name: omlx/qwen3-vl-8b
     litellm_params:
       model: openai/Qwen3-VL-8B-Instruct-MLX-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
-  - model_name: omlx/qwen3-vl-30b-a3b
-    litellm_params:
-      model: openai/Qwen3-VL-30B-A3B-Instruct-MLX-4bit
-      api_base: os.environ/OMLX_API_BASE
-      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: omlx/qwen3.5-2b
     litellm_params:
       model: openai/Qwen3.5-2B-MLX-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: omlx/qwen3.5-4b
     litellm_params:
       model: openai/Qwen3.5-4B-MLX-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: omlx/qwen3.5-9b
     litellm_params:
       model: openai/Qwen3.5-9B-MLX-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
-  - model_name: omlx/qwen3.5-27b
-    litellm_params:
-      model: openai/Qwen3.5-27B-4bit
-      api_base: os.environ/OMLX_API_BASE
-      api_key: os.environ/OMLX_API_KEY
-  - model_name: omlx/qwen3.5-27b-distilled
-    litellm_params:
-      model: openai/Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit
-      api_base: os.environ/OMLX_API_BASE
-      api_key: os.environ/OMLX_API_KEY
-  - model_name: omlx/qwen3.5-35b-a3b
-    litellm_params:
-      model: openai/Qwen3.5-35B-A3B-4bit
-      api_base: os.environ/OMLX_API_BASE
-      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: omlx/gpt-oss-20b
     litellm_params:
       model: openai/gpt-oss-20b-MXFP4-Q8
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
+    model_info:
+      max_input_tokens: 131072
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_function_calling: true
+
   - model_name: omlx/gemma-4-26b-a4b
     litellm_params:
       model: openai/gemma-4-26b-a4b-it-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
-  - model_name: omlx/gemma-4-31b
-    litellm_params:
-      model: openai/gemma-4-31b-it-4bit
-      api_base: os.environ/OMLX_API_BASE
-      api_key: os.environ/OMLX_API_KEY
-  - model_name: omlx/gemma-4-31b-crack
-    litellm_params:
-      model: openai/Gemma-4-31B-JANG_4M-CRACK
-      api_base: os.environ/OMLX_API_BASE
-      api_key: os.environ/OMLX_API_KEY
+    model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      supports_function_calling: true
+
   - model_name: omlx/gemma-4-e2b
     litellm_params:
       model: openai/gemma-4-e2b-it-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
     model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
       supports_vision: true
       supports_audio_input: true
+      supports_function_calling: true
+
   - model_name: omlx/gemma-4-e4b
     litellm_params:
       model: openai/gemma-4-e4b-it-4bit
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
     model_info:
+      max_input_tokens: 128000
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
       supports_vision: true
       supports_audio_input: true
+      supports_function_calling: true
+
   # Special / utility models
   - model_name: omlx/qwen3-forced-aligner-0.6b
     litellm_params:
       model: openai/Qwen3-ForcedAligner-0.6B
       api_base: os.environ/OMLX_API_BASE
       api_key: os.environ/OMLX_API_KEY
+
   - model_name: omlx/qwen3-tts-tokenizer-12hz
     litellm_params:
       model: openai/Qwen3-TTS-Tokenizer-12Hz

@@ -10,54 +10,67 @@ services:
       - ./.htpasswd:/etc/nginx/.htpasswd:ro
       - nginx_logs:/var/log/nginx
     depends_on:
-      - mlflow
+      mlflow:
+        condition: service_started
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
 
   litellm:
     build:
       context: .
       dockerfile: Dockerfile
-    #########################################
-    ## Uncomment these lines to start proxy with a config.yaml file ##
+
     volumes:
-     - ./config.yaml:/app/config.yaml
-     - github_copilot_auth_data:/root/.config/litellm/github_copilot
-     - chatgpt_auth_data:/root/.config/litellm/chatgpt
+      # 主設定檔：只放 include + global settings + router_settings
+      - ./config.yaml:/app/config.yaml:ro
+
+      # 拆分後的模型設定
+      - ./litellm-config:/app/litellm-config:ro
+
+      # OAuth token persistence
+      - github_copilot_auth_data:/root/.config/litellm/github_copilot
+      - chatgpt_auth_data:/root/.config/litellm/chatgpt
 
     command:
-     - "--config=/app/config.yaml"
-    ##############################################
+      - "--config=/app/config.yaml"
+
     restart: always
-    
+
     ports:
       - "4000:4000" # 直接對外暴露的端口
     expose:
-      - "4000"  # 在 Docker 內部網路可見,透過 Nginx 訪問
+      - "4000"      # Docker 內部網路可見，透過 Nginx 訪問
+
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
-      STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
+      STORE_MODEL_IN_DB: "True"
       GITHUB_COPILOT_TOKEN_DIR: "/root/.config/litellm/github_copilot"
       CHATGPT_TOKEN_DIR: "/root/.config/litellm/chatgpt"
+
     env_file:
-      - .env # Load local .env file
+      - .env
+
     deploy:
       resources:
         limits:
-          cpus: '2.0'
+          cpus: "2.0"
           memory: 4G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
+
     depends_on:
-      - db  # Indicates that this service depends on the 'db' service, ensuring 'db' starts first
-      - mlflow  # Ensure MLflow starts before litellm
+      db:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -71,18 +84,26 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       # 注意：此端口暴露用於外部工具連接（如 DBeaver、pgAdmin）
-      # 如果不需要外部訪問，可以註解掉此行以提高安全性
+      # 如果不需要外部訪問，可以註解掉此行以提高安全性。
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Persists Postgres data across container restarts
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro # 初始化 MLflow 資料庫
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
 
   mlflow:
@@ -91,14 +112,13 @@ services:
       dockerfile: Dockerfile.mlflow
     container_name: mlflow
     ports:
-      - "127.0.0.1:5001:5000"  # 只允許宿主機本地訪問,不暴露到區網
+      - "127.0.0.1:5001:5000"  # 只允許宿主機本地訪問，不暴露到區網
     expose:
       - "5000"
     volumes:
       - mlflow_data:/mlflow/mlruns
     environment:
-      # 允許來自外部反向代理 domain 的跨來源 POST 請求（MLflow CORSBlockingMiddleware）
-      # 預設只允許 localhost，透過 Cloudflare Tunnel 等反向代理存取時需設定此變數
+      # 允許來自外部反向代理 domain 的跨來源 POST 請求。
       MLFLOW_SERVER_CORS_ALLOWED_ORIGINS: "https://${MLFLOW_EXTRA_HOSTS}"
     command:
       - mlflow
@@ -110,25 +130,26 @@ services:
       - --serve-artifacts
       - --allowed-hosts=mlflow:5000,mlflow,127.0.0.1,localhost,localhost:5001,localhost:5002
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: always
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
 
 volumes:
   postgres_data:
-    name: litellm_postgres_data # Named volume for Postgres data persistence
+    name: litellm_postgres_data
   mlflow_data:
     driver: local
   nginx_logs:
     driver: local
   github_copilot_auth_data:
     driver: local
-  chatgpt_auth_data: 
+  chatgpt_auth_data:
     driver: local

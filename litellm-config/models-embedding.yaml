@@ -1,0 +1,17 @@
+model_list:
+  - model_name: embedding/qwen3-0.6b
+    litellm_params:
+      model: lm_studio/text-embedding-qwen3-embedding-0.6b
+      rpm: 120
+      tpm: 200000
+    model_info:
+      mode: embedding
+      max_input_tokens: 32768
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      metadata:
+        provider: lm_studio
+        runtime: local
+        purpose: embedding
+        original_model_name: qwen3-embedding
+        reason: "改成 embedding/* namespace，避免 provider/runtime/model 混在同一層命名。"

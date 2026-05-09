@@ -1,0 +1,50 @@
+model_list:
+  # ============================================================
+  # GitHub Copilot Models
+  # ============================================================
+
+  - model_name: copilot/claude-sonnet-4.6
+    litellm_params:
+      model: github_copilot/claude-sonnet-4.6
+      rpm: 10
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 1000000
+      max_output_tokens: 64000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      metadata:
+        provider: github_copilot
+        runtime: cloud
+        purpose: coding
+        original_model_name: anthropic/claude-sonnet-4.6
+        tool_calling_assumption: "unknown_or_partial"
+
+  - model_name: copilot/claude-haiku-4.5
+    litellm_params:
+      model: github_copilot/claude-haiku-4.5
+      rpm: 10
+      extra_headers:
+        editor-version: "vscode/1.85.1"
+        editor-plugin-version: "copilot/1.155.0"
+        Copilot-Integration-Id: "vscode-chat"
+        user-agent: "GithubCopilot/1.155.0"
+        Copilot-Vision-Request: "true"
+    model_info:
+      max_input_tokens: 200000
+      max_output_tokens: 64000
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+      supports_vision: true
+      metadata:
+        provider: github_copilot
+        runtime: cloud
+        purpose: fast-coding
+        original_model_name: anthropic/claude-haiku-4.5
+        tool_calling_assumption: "unknown_or_partial"

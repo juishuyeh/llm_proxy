@@ -1,0 +1,63 @@
+model_list:
+  # ============================================================
+  # MiniMax Models
+  # ============================================================
+
+  - model_name: minimax/m2.5
+    litellm_params:
+      model: minimax/MiniMax-M2.5
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/v1
+      rpm: 30
+      tpm: 300000
+    model_info:
+      max_input_tokens: 196608
+      max_output_tokens: 65536
+      input_cost_per_token: 0.000000118
+      output_cost_per_token: 0.00000099
+      supports_function_calling: true
+      metadata:
+        provider: minimax
+        runtime: cloud
+        purpose: cheap-long-context
+        original_model_name: minimax/MiniMax-M2.5
+
+  - model_name: minimax/m2.7
+    litellm_params:
+      model: minimax/MiniMax-M2.7
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/v1
+      rpm: 20
+      tpm: 300000
+    model_info:
+      max_input_tokens: 204800
+      max_output_tokens: 131072
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      supports_function_calling: true
+      metadata:
+        provider: minimax
+        runtime: cloud
+        purpose: long-context
+        original_model_name: minimax/MiniMax-M2.7
+
+  # Anthropic-compatible route。
+  - model_name: minimax/m2.7-anthropic
+    litellm_params:
+      model: minimax/MiniMax-M2.7
+      api_key: os.environ/MINIMAX_API_KEY
+      api_base: https://api.minimax.io/anthropic/v1/messages
+      rpm: 20
+      tpm: 300000
+    model_info:
+      max_input_tokens: 204800
+      max_output_tokens: 131072
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      supports_function_calling: true
+      metadata:
+        provider: minimax
+        api_compat: anthropic
+        runtime: cloud
+        purpose: anthropic-compatible
+        original_model_name: minimax/MiniMax-M2.7-anthropic

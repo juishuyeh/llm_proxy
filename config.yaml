@@ -13,6 +13,28 @@ model_list:
 
   # GITHUB MODELS
 
+  # ChatGPT Subscription
+  - model_name: chatgpt/gpt-5.3-codex
+    model_info:
+      mode: responses
+    litellm_params:
+      model: chatgpt/gpt-5.3-codex
+  - model_name: chatgpt/gpt-5.4-mini
+    model_info:
+      mode: responses
+    litellm_params:
+      model: chatgpt/gpt-5.4-mini
+  - model_name: chatgpt/gpt-5.4
+    model_info:
+      mode: responses
+    litellm_params:
+      model: chatgpt/gpt-5.4
+  - model_name: chatgpt/gpt-5.5
+    model_info:
+      mode: responses
+    litellm_params:
+      model: chatgpt/gpt-5.5
+
   # GITHUB COPILOT MODELS
   - model_name: anthropic/claude-sonnet-4.6
     litellm_params:

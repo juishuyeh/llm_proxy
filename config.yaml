@@ -13,7 +13,6 @@
 include:
   - /app/litellm-config/models-embedding.yaml
   - /app/litellm-config/models-chatgpt.yaml
-  - /app/litellm-config/models-minimax.yaml
   - /app/litellm-config/models-omlx-audio.yaml
   - /app/litellm-config/models-omlx-chat.yaml
 
@@ -54,7 +53,6 @@ router_settings:
     - "openai/gpt-5.4": ["openai/gpt-5.4-mini", "local/qwen3.6-35b-a3b"]
     - "openai/gpt-5.4-mini": ["local/gemma-4-26b-a4b", "local/qwen3.6-27b"]
     - "openai/gpt-5.3-codex": ["local/gpt-oss-20b", "local/qwen3.6-35b-a3b"]
-    - "minimax/m2.7": ["local/qwen3.6-35b-a3b"]
 
   # 官方格式同樣是 List[Dict[str, List[str]]]
   context_window_fallbacks:

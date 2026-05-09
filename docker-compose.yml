@@ -29,6 +29,8 @@ services:
     volumes:
      - ./config.yaml:/app/config.yaml
      - github_copilot_auth_data:/root/.config/litellm/github_copilot
+     - chatgpt_auth_data:/root/.config/litellm/chatgpt
+
     command:
      - "--config=/app/config.yaml"
     ##############################################
@@ -41,6 +43,8 @@ services:
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
       STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
+      GITHUB_COPILOT_TOKEN_DIR: "/root/.config/litellm/github_copilot"
+      CHATGPT_TOKEN_DIR: "/root/.config/litellm/chatgpt"
     env_file:
       - .env # Load local .env file
     deploy:
@@ -125,4 +129,6 @@ volumes:
   nginx_logs:
     driver: local
   github_copilot_auth_data:
+    driver: local
+  chatgpt_auth_data: 
     driver: local

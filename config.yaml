@@ -13,7 +13,6 @@
 include:
   - /app/litellm-config/models-embedding.yaml
   - /app/litellm-config/models-chatgpt.yaml
-  - /app/litellm-config/models-copilot.yaml
   - /app/litellm-config/models-minimax.yaml
   - /app/litellm-config/models-omlx-audio.yaml
   - /app/litellm-config/models-omlx-chat.yaml
@@ -51,16 +50,15 @@ router_settings:
 
   # 官方格式：List[Dict[str, List[str]]]
   fallbacks:
-    - "openai/gpt-5.5": ["openai/gpt-5.4", "minimax/m2.7", "local/qwen3.6-35b-a3b"]
-    - "openai/gpt-5.4": ["openai/gpt-5.4-mini", "minimax/m2.7", "local/qwen3.6-35b-a3b"]
-    - "openai/gpt-5.4-mini": ["minimax/m2.5", "local/qwen3.6-27b"]
-    - "openai/gpt-5.3-codex": ["copilot/claude-sonnet-4.6", "local/gpt-oss-20b", "local/qwen3.6-35b-a3b"]
-    - "copilot/claude-sonnet-4.6": ["copilot/claude-haiku-4.5", "local/gpt-oss-20b"]
-    - "minimax/m2.7": ["minimax/m2.5", "local/qwen3.6-35b-a3b"]
+    - "openai/gpt-5.5": ["openai/gpt-5.4", "local/qwen3.6-35b-a3b"]
+    - "openai/gpt-5.4": ["openai/gpt-5.4-mini", "local/qwen3.6-35b-a3b"]
+    - "openai/gpt-5.4-mini": ["local/gemma-4-26b-a4b", "local/qwen3.6-27b"]
+    - "openai/gpt-5.3-codex": ["local/gpt-oss-20b", "local/qwen3.6-35b-a3b"]
+    - "minimax/m2.7": ["local/qwen3.6-35b-a3b"]
 
   # 官方格式同樣是 List[Dict[str, List[str]]]
   context_window_fallbacks:
-    - "openai/gpt-5.4-mini": ["minimax/m2.7", "copilot/claude-sonnet-4.6"]
+    - "openai/gpt-5.4-mini": ["local/gemma-4-26b-a4b"]
     - "local/qwen3-vl-8b": ["local/gemma-4-26b-a4b"]
 
 general_settings:

@@ -231,3 +231,6 @@ backup-*.tar.gz
 postgres_data/
 mlflow_data/
 nginx_logs/
+
+# oMLX 測試產生的音訊輸出
+omlx_output_*.wav

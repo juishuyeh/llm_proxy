@@ -1,11 +1,12 @@
 # LiteLLM Proxy 服務
 
-這是一個基於 LiteLLM 的 AI 模型代理服務，提供統一的 OpenAI 相容 API 介面來訪問多個大型語言模型（LLM）提供商，並整合了 MLflow 用於實驗追蹤和 API 請求記錄。
+這是一個基於 LiteLLM 的 AI 模型代理服務，提供統一的 OpenAI 相容 API 介面來訪問多個大型語言模型（LLM）後端，並整合了 MLflow 用於實驗追蹤和 API 請求記錄。
 
 ## 功能特色
 
-- 🚀 **多模型支援**：整合 5 大 LLM 提供商（OpenRouter、Google Gemini、GitHub Models、GitHub Copilot、LM Studio），支援 33+ 種模型
-- 🔐 **安全管理**：API 金鑰認證、速率限制
+- 🚀 **多後端整合**：統一代理 ChatGPT 訂閱（雲端）、oMLX 本地推理、LM Studio 本地嵌入，目前載入 22 個模型
+- 🧩 **拆分式設定**：`config.yaml` 負責全域與路由設定，模型清單依用途拆分於 `litellm-config/`（詳見[設定架構](docs/config-architecture.md)）
+- 🔐 **安全管理**：API 金鑰認證、每模型速率限制（RPM / TPM）
 - 📊 **完整監控**：整合 MLflow 追蹤實驗與 API 請求記錄
 - 🐳 **容器化部署**：使用 Docker Compose 一鍵啟動所有服務
 - 💾 **持久化儲存**：PostgreSQL 資料庫確保資料不遺失
@@ -14,66 +15,57 @@
 
 ## 支援的模型
 
-本服務整合了多個 LLM 提供商，總計支援 **33+ 種模型**：
+模型清單定義於 `litellm-config/`，由 `config.yaml` 的 `include` 載入。目前載入 **22 個模型**。
 
-### 🌟 OpenRouter（免費模型）
-- **OpenAI GPT-OSS-20B** - 速率限制：18 RPM
+> 完整數值（context / output / cost）以各 `litellm-config/*.yaml` 的 `model_info` 為準，或呼叫 `/model/info` 查詢。
 
-### 🤖 Google Gemini（需要 API Key）
-- **Gemini 2.5 Pro** - 2 RPM, 125K TPM, 50 RPD
-- **Gemini 2.5 Flash** - 10 RPM, 250K TPM, 250 RPD
-- **Gemini 2.5 Flash Lite** - 15 RPM, 250K TPM, 1000 RPD
-- **Gemini 2.0 Flash** - 15 RPM, 1M TPM, 200 RPD（支援視覺）
-- **Gemini 2.5 Flash TTS** - 3 RPM, 10K TPM, 15 RPD（文字轉語音）
+### 🤖 ChatGPT 訂閱（雲端，透過 OAuth）
 
-### 🖥️ LM Studio（本地模型，無速率限制）
-- **Qwen3 Vision**: 4B, 8B, 30B
-- **Qwen3 Coder**: 30B
-- **Google Gemma 3**: 1B, 4B, 12B, 27B
-- **OpenAI GPT-OSS-20B**
+| 模型 | 用途 | 速率限制 |
+|------|------|----------|
+| `openai/gpt-5.5` | 進階推理 | 10 RPM / 250K TPM |
+| `openai/gpt-5.4` | 一般推理 | 20 RPM / 300K TPM |
+| `openai/gpt-5.4-mini` | 快速通用 | 30 RPM / 400K TPM |
+| `openai/gpt-5.3-codex` | 程式撰寫 | 20 RPM / 300K TPM |
 
-### 🐙 GitHub Models（需要 GitHub Token）
-- **GPT-4o Mini** - 2 RPM
-- **GPT-4.1** - 2 RPM
-- **GPT-4o** - 2 RPM
-- **GPT-5 Mini** - 2 RPM
-- **GPT-5** - 2 RPM
+### 🖥️ oMLX 本地 — 對話 / 視覺（無 API 費用）
 
-### 💻 GitHub Copilot（需要 Copilot 訂閱）
-**OpenAI 模型：**
-- **GPT-4o Mini** - 10 RPM
-- **GPT-4.1** - 10 RPM（支援視覺）
-- **GPT-4o** - 10 RPM（支援視覺）
-- **GPT-5 Mini** - 10 RPM（支援視覺）
-- **GPT-5** - 10 RPM（支援視覺）
+| 模型 | 說明 | 速率限制 |
+|------|------|----------|
+| `local/qwen3.6-35b-a3b`、`local/qwen3.6-35b-a3b-think` | 通用 / 推理版 | 8 / 4 RPM |
+| `local/qwen3.6-27b`、`local/qwen3.6-27b-think` | 快速通用 / 推理版 | 10 / 5 RPM |
+| `local/gpt-oss-20b` | 快速程式撰寫 | 10 RPM |
+| `local/gemma-4-26b-a4b` | 通用（支援視覺） | 8 RPM |
+| `local/gemma-4-e2b`、`local/gemma-4-e4b` | 通用（支援視覺） | 8 RPM |
+| `local/qwen3-vl-8b` | 視覺 | 20 RPM |
 
-**Anthropic 模型：**
-- **Claude Sonnet 4.5** - 10 RPM（支援視覺）
-- **Claude Opus 4.5** - 3 RPM（支援視覺）
-- **Claude Haiku 4.5** - 10 RPM（支援視覺）
+### 🎙️ oMLX 本地 — 語音
 
-**Google 模型：**
-- **Gemini 3 Pro Preview** - 10 RPM（支援視覺）
-- **Gemini 3 Flash Preview** - 10 RPM（支援視覺）
-- **Gemini 2.5 Pro** - 10 RPM（支援視覺）
+- **ASR（語音轉文字）**：`asr/qwen3-0.6b`、`asr/qwen3-1.7b`、`asr/whisper-large-v3-turbo`
+- **TTS（文字轉語音）**：`tts/qwen3-1.7b-base`、`tts/qwen3-1.7b-voicedesign`、`tts/qwen3-1.7b-customvoice`
+- **工具模型**：`utility/qwen3-forced-aligner-0.6b`、`utility/qwen3-tts-tokenizer-12hz`
 
-**其他模型：**
-- **X.AI Grok Code Fast 1** - 10 RPM
-- **Raptor Mini** - 10 RPM
+詳細 curl 範例見 [oMLX API 參考](docs/omlx/api-reference.md)。
 
-> **注意**：RPM = 每分鐘請求數, TPM = 每分鐘 Token 數, RPD = 每日請求數。詳細配置請參見 [config.yaml](config.yaml)。
+### 🔡 嵌入（LM Studio 本地）
+
+- `embedding/qwen3-0.6b` — 120 RPM / 200K TPM
+
+### ⏸️ 停用中
+
+- **MiniMax**（`minimax/m2.5`、`minimax/m2.7`、`minimax/m2.7-anthropic`）：定義於 `litellm-config/models-minimax.yaml`，但未被 `config.yaml` 的 `include` 載入，目前不會生效。
+
+> **注意**：RPM = 每分鐘請求數，TPM = 每分鐘 Token 數。詳細配置請參見 `config.yaml` 及 `litellm-config/`。
 
 ## 快速開始
 
 ### 前置需求
 
 - Docker 和 Docker Compose
-- 至少一個 LLM 提供商的 API 金鑰：
-  - **OpenRouter**（免費）：從 [openrouter.ai](https://openrouter.ai) 取得
-  - **Google Gemini**（免費額度）：從 [Google AI Studio](https://makersuite.google.com/app/apikey) 取得
-  - **GitHub Models**（免費）：使用 GitHub Personal Access Token
-  - **GitHub Copilot**（需訂閱）：需要有效的 Copilot 訂閱
-  - **LM Studio**（本地）：在本機安裝 [LM Studio](https://lmstudio.ai/)
+- 後端來源（至少一個）：
+  - **ChatGPT 訂閱**：透過 LiteLLM 的 ChatGPT OAuth 登入，token 會快取於 `chatgpt_auth_data` volume
+  - **oMLX**（本地，macOS）：在宿主機執行 oMLX 伺服器，提供對話 / 視覺 / ASR / TTS 模型
+  - **LM Studio**（本地）：在宿主機安裝 [LM Studio](https://lmstudio.ai/)，提供嵌入模型
 
 ### 1. 複製專案
 
@@ -96,22 +88,32 @@ cp .env.example .env
 # 必要設定
 LITELLM_MASTER_KEY='sk-your-master-key-here'
 
-# LLM 提供商 API 金鑰（至少設定一個）
-OPENROUTER_API_KEY='your_openrouter_api_key_here'      # OpenRouter
-GEMINI_API_KEY='your_gemini_api_key_here'              # Google Gemini
-GITHUB_API_KEY='your_github_token_here'                # GitHub Models
+# 資料庫
+POSTGRES_DB='litellm'
+POSTGRES_USER='llmproxy'
+POSTGRES_PASSWORD='your_secure_db_password_here'
 
 # UI 登入憑證（建議修改）
 UI_USERNAME='admin'
 UI_PASSWORD='your_secure_password_here'
 
-# 資料庫密碼（建議修改）
-POSTGRES_PASSWORD='your_secure_db_password_here'
+# oMLX 本地後端（對話 / 視覺 / ASR / TTS 模型）
+OMLX_API_KEY='omlx'
+OMLX_API_BASE='http://host.docker.internal:8005/v1'
 
-# 本地模型（選用）
+# LM Studio 本地後端（嵌入模型）
 LM_STUDIO_API_KEY='lm-studio'
 LM_STUDIO_API_BASE='http://host.docker.internal:1234/v1'
+
+# MLflow
+MLFLOW_TRACKING_URI='http://mlflow:5000'
+MLFLOW_EXPERIMENT_NAME='litellm-local-experiment'
+
+# MiniMax（選用，預設停用 — 需在 config.yaml 的 include 加入 models-minimax.yaml 才生效）
+MINIMAX_API_KEY='your_minimax_api_key_here'
 ```
+
+> Docker 容器透過 `host.docker.internal` 存取宿主機上的 oMLX / LM Studio 服務，請依實際位址與端口調整 `OMLX_API_BASE`、`LM_STUDIO_API_BASE`。
 
 ### 3. 啟動服務
 
@@ -122,8 +124,8 @@ docker compose up -d
 這個指令會啟動以下服務：
 - **LiteLLM Proxy**：AI 模型代理服務（端口 4000）
 - **PostgreSQL**：資料庫服務（端口 5432）
-- **MLflow**：實驗追蹤服務（端口 5001，僅限本機訪問）
-- **Nginx**：MLflow 認證代理（端口 5001）
+- **MLflow**：實驗追蹤服務（端口 5001，僅限本機直連）
+- **Nginx**：MLflow 認證代理（端口 5002）
 
 ### 4. 訪問服務
 
@@ -135,48 +137,48 @@ docker compose up -d
 - **LiteLLM Web UI**：http://localhost:4000/ui
   - 使用 `.env` 中設定的 `UI_USERNAME` 和 `UI_PASSWORD` 登入
   - 管理模型、查看使用統計
-- **MLflow Dashboard**：http://localhost:5001
-  - 查看 API 呼叫追蹤和實驗記錄
-  - 僅限 localhost 訪問（安全考量）
+- **MLflow Dashboard**：
+  - **直連（無認證，僅限本機）**：http://127.0.0.1:5001
+  - **Nginx 認證代理（可對外，需基本認證）**：http://localhost:5002 — 帳密來自 `.htpasswd`
 
 ### 5. API 使用範例
 
 使用 OpenAI 相容的 API 格式呼叫模型：
 
 ```bash
-# 使用 Google Gemini 模型
+# 使用 ChatGPT 訂閱模型
 curl -X POST http://localhost:4000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $LITELLM_MASTER_KEY" \
   -d '{
-    "model": "google/gemini-2.5-flash",
+    "model": "openai/gpt-5.4",
     "messages": [
       {"role": "user", "content": "你好，請介紹一下你自己"}
     ]
   }'
 
-# 使用 GitHub Copilot Claude 模型
+# 使用 oMLX 本地視覺模型
 curl -X POST http://localhost:4000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $LITELLM_MASTER_KEY" \
   -d '{
-    "model": "anthropic/claude-sonnet-4.5",
-    "messages": [
-      {"role": "user", "content": "Hello, introduce yourself"}
-    ]
-  }'
-
-# 使用本地 LM Studio 模型
-curl -X POST http://localhost:4000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $LITELLM_MASTER_KEY" \
-  -d '{
-    "model": "gemma-3-12b",
+    "model": "local/gemma-4-e2b",
     "messages": [
       {"role": "user", "content": "What is AI?"}
     ]
   }'
+
+# 使用嵌入模型
+curl -X POST http://localhost:4000/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $LITELLM_MASTER_KEY" \
+  -d '{
+    "model": "embedding/qwen3-0.6b",
+    "input": "要計算向量的文字"
+  }'
 ```
+
+oMLX 語音端點（ASR / TTS）的 curl 範例見 [oMLX API 參考](docs/omlx/api-reference.md)。
 
 ## 常用指令
 
@@ -210,16 +212,22 @@ docker compose down
 # 重啟所有服務
 docker compose restart
 
-# 重啟特定服務
+# 重啟特定服務（例如修改 config.yaml 或 litellm-config/ 後）
 docker compose restart litellm
 ```
 
 ### 重新建置映像檔
 
-如果修改了 Dockerfile，需要重新建置：
+修改了 `Dockerfile` / `Dockerfile.mlflow` 或 Python 依賴後需要重新建置：
 
 ```bash
+# 一般重建
 docker compose build
+docker compose up -d
+
+# 忽略快取完整重建
+docker compose down
+docker compose build --no-cache
 docker compose up -d
 ```
 
@@ -238,12 +246,13 @@ docker compose up -d
 
 ## 資料持久化
 
-以下資料會持久化儲存：
+以下資料會持久化儲存於 Docker volumes：
 
-- **PostgreSQL 資料**：儲存在 `litellm_postgres_data` volume（LiteLLM 和 MLflow 資料庫）
-- **MLflow Artifacts**：儲存在 `mlflow_data` volume（實驗追蹤資料）
-- **Nginx 日誌**：儲存在 `nginx_logs` volume（MLflow 認證代理日誌）
-- **GitHub Copilot 認證**：儲存在 `github_copilot_auth_data` volume（認證快取）
+- **PostgreSQL 資料**：`litellm_postgres_data`（LiteLLM 和 MLflow 資料庫）
+- **MLflow Artifacts**：`mlflow_data`（實驗追蹤資料）
+- **Nginx 日誌**：`nginx_logs`（MLflow 認證代理日誌）
+- **ChatGPT OAuth token**：`chatgpt_auth_data`（ChatGPT 訂閱認證快取）
+- **GitHub Copilot OAuth token**：`github_copilot_auth_data`（保留供未來啟用 Copilot 後端使用）
 
 即使容器重啟，這些資料也不會遺失。
 
@@ -251,31 +260,36 @@ docker compose up -d
 
 ### 新增自訂模型
 
-編輯 `config.yaml` 檔案，在 `model_list` 中新增模型設定：
+模型清單定義於 `litellm-config/` 下依用途拆分的 YAML 檔（非 `config.yaml`）。在對應的檔案的 `model_list` 中新增模型：
 
 ```yaml
 model_list:
-  - model_name: your-custom-model
+  - model_name: local/your-custom-model
     litellm_params:
-      model: provider/model-name
-      api_key: "os.environ/YOUR_API_KEY"
-      rpm: 18
+      model: openai/actual-model-id
+      api_base: os.environ/OMLX_API_BASE
+      api_key: os.environ/OMLX_API_KEY
+      rpm: 10
+    model_info:
+      max_input_tokens: 131072
+      max_output_tokens: 16384
 ```
 
-記得在 `.env` 檔案中新增對應的 API 金鑰。
+若是新增整個 YAML 檔，記得把它加進 `config.yaml` 的 `include` 清單。詳見[設定架構](docs/config-architecture.md)與[模型同步 Runbook](docs/model-sync-runbook.md)。
 
 ### 修改速率限制
 
-在 `config.yaml` 中調整各模型的 `rpm` 參數：
+在 `litellm-config/` 對應的模型檔中調整各模型的 `rpm` / `tpm`：
 
 ```yaml
-- model_name: google/gemini-2.5-flash
+- model_name: openai/gpt-5.4
   litellm_params:
-    model: gemini/gemini-2.5-flash
-    api_key: "os.environ/GEMINI_API_KEY"
-    rpm: 20  # 修改為您需要的速率（原本是 10）
-    tpm: 500000  # 同時也可以調整 TPM
+    model: chatgpt/gpt-5.4
+    rpm: 30   # 修改為您需要的速率
+    tpm: 400000
 ```
+
+修改後重啟：`docker compose restart litellm`。
 
 ### PostgreSQL 外部訪問
 
@@ -295,12 +309,12 @@ db:
 ### 服務無法啟動
 
 1. 檢查 `.env` 檔案是否正確設定
-2. 確認端口 4000、5001、5432 沒有被佔用
+2. 確認端口 4000、5001、5002、5432 沒有被佔用
 3. 查看服務日誌：`docker compose logs -f`
 
 ### API 呼叫失敗
 
-1. 檢查對應提供商的 API 金鑰是否正確（`OPENROUTER_API_KEY`、`GEMINI_API_KEY`、`GITHUB_API_KEY` 等）
+1. 檢查後端來源是否可用（oMLX / LM Studio 伺服器是否在宿主機執行、ChatGPT OAuth 是否已登入）
 2. 檢查 `LITELLM_MASTER_KEY` 是否正確設定在請求標頭中
 3. 確認模型名稱是否正確（參見[支援的模型](#支援的模型)）
 4. 查看 LiteLLM 日誌：`docker compose logs -f litellm`
@@ -315,10 +329,9 @@ db:
 ### 速率限制錯誤
 
 如果遇到 429 錯誤（Too Many Requests）：
-1. 檢查是否超過該提供商的 API 額度限制（詳見[支援的模型](#支援的模型)）
-2. 降低 `config.yaml` 中對應模型的 `rpm`/`tpm`/`rpd` 設定
+1. 檢查是否超過該後端的速率限制（詳見[支援的模型](#支援的模型)）
+2. 降低對應模型在 `litellm-config/*.yaml` 中的 `rpm` / `tpm` 設定
 3. 等待速率限制重置（通常是 1 分鐘）後重試
-4. 等待速率限制重置後重試
 
 ## 手動安裝（不使用 Docker）
 
@@ -381,31 +394,33 @@ uv run litellm --config config.yaml --port 4000 --detailed_debug
 │  - API Clients                │    │  (localhost:4000/ui) │
 │  - Python/Node.js/cURL        │    └──────────────────────┘
 └───────────────┬───────────────┘
-                │ HTTP Requests
+                │ HTTP Requests (Port 4000)
                 ▼
 ┌────────────────────────────────────────────────────────────┐
 │          LiteLLM Proxy Service (Port 4000)                 │
-│  - OpenAI-compatible API (/v1/chat/completions)            │
-│  - Multi-provider Routing (5 providers, 33+ models)        │
-│  - Per-model Rate Limiting (RPM/TPM/RPD)                   │
-│  - API Key Authentication                                  │
+│  - OpenAI-compatible API (/v1/chat/completions 等)         │
+│  - 多後端路由（config.yaml + litellm-config/）              │
+│  - 每模型速率限制（RPM / TPM）                              │
+│  - API Key 認證                                            │
 └───┬────────────────┬───────────────────┬───────────────────┘
-    │                │                   │
     │ Log Requests   │ Store Metadata    │ Forward API Calls
     ▼                ▼                   ▼
-┌──────────┐   ┌─────────────┐   ┌─────────────────────────┐
-│ MLflow   │   │ PostgreSQL  │   │  LLM Providers:         │
-│ (5001)   │   │  (5432)     │   │  - OpenRouter           │
-│  ▲       │◄──┤  - LiteLLM  │   │  - Google Gemini        │
-│  │ Nginx │   │  - MLflow   │   │  - GitHub Models        │
-│  │ Auth  │   │             │   │  - GitHub Copilot       │
-│  │ Proxy │   └─────────────┘   │  - LM Studio (本地)      │
-└──────────┘                     └─────────────────────────┘
+┌──────────┐   ┌─────────────┐   ┌─────────────────────────────┐
+│ MLflow   │   │ PostgreSQL  │   │  後端：                      │
+│ :5000    │◄──┤  :5432      │   │  - ChatGPT 訂閱（雲端）       │
+│  ▲       │   │  - LiteLLM  │   │  - oMLX 本地（對話/視覺/語音） │
+│  │ Nginx │   │  - MLflow   │   │  - LM Studio 本地（嵌入）      │
+│  │ Auth  │   └─────────────┘   └─────────────────────────────┘
+│  │ :5002 │
+└──────────┘
+   MLflow 對外：:5001 直連（無認證，僅 localhost）/ :5002 Nginx 認證代理
 
 持久化儲存 (Docker Volumes):
-  - postgres_data: 資料庫資料
-  - mlflow_data: MLflow artifacts
-  - github_copilot_auth_data: Copilot 認證快取
+  - litellm_postgres_data: 資料庫資料
+  - mlflow_data:           MLflow artifacts
+  - nginx_logs:            Nginx 日誌
+  - chatgpt_auth_data:     ChatGPT OAuth token
+  - github_copilot_auth_data: Copilot OAuth token（保留）
 ```
 
 ## 授權
@@ -416,13 +431,11 @@ uv run litellm --config config.yaml --port 4000 --detailed_debug
 
 如有問題或需要協助，請提交 Issue 或 Pull Request。
 
-## 重建 docker 映像檔
-如果需要重建 Docker 映像檔，可以使用以下指令：
+## 📚 文件
 
-```bash
-docker compose down
-docker compose build --no-cache
-docker compose up -d
-```
-這將會忽略快取，重新建置所有服務的映像檔。
-這將會停止目前的服務，重新建置映像檔，並以分離模式啟動服務。
+更多細節文件集中於 [`docs/`](docs/)：
+
+- [設定架構](docs/config-architecture.md) — `config.yaml` 與 `litellm-config/` 的拆分與 `include` 機制
+- [模型同步 Runbook](docs/model-sync-runbook.md) — LiteLLM ↔ opencode 模型清單同步流程
+- [oMLX API 參考](docs/omlx/api-reference.md) — oMLX 後端的 curl 範例與功能支援狀態
+- [oMLX 音訊輸入問題](docs/omlx/audio-input-issue.md) — Chat 端點 audio input 未支援的上游 issue 草稿

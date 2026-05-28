@@ -32,21 +32,6 @@ router_settings:
   # simple-shuffle 是多 deployment 時的穩健預設。
   routing_strategy: simple-shuffle
 
-  # 明確設定重試次數，避免依賴版本預設值。
-  num_retries: 2
-
-  # 在送出 request 前先做 context window 檢查。
-  enable_pre_call_checks: true
-
-  # 讓 litellm_params.rpm/tpm 真的進入 pre-call rate-limit enforcement。
-  optional_pre_call_checks:
-    - enforce_model_rate_limits
-
-  # Provider/model 失敗後進入 cooldown，避免一直打壞掉的 route。
-  allowed_fails: 3
-  cooldown_time: 30
-  disable_cooldowns: false
-
   # 官方格式：List[Dict[str, List[str]]]
   fallbacks:
     - "openai/gpt-5.5": ["openai/gpt-5.4", "local/qwen3.6-35b-a3b"]
@@ -65,12 +50,6 @@ general_settings:
 
   # 保留 DB 管理模型，符合你原本設定。
   store_model_in_db: true
-
-  # 降低 DB 寫入壓力。
-  proxy_batch_write_at: 60
-
-  # 控制 DB connection pool，避免小主機連線數爆掉。
-  database_connection_pool_limit: 10
 
   # 明確指定 token rate limit 計算方式。
   token_rate_limit_type: "total"

@@ -109,6 +109,11 @@ LM_STUDIO_API_BASE='http://host.docker.internal:1234/v1'
 MLFLOW_TRACKING_URI='http://mlflow:5000'
 MLFLOW_EXPERIMENT_NAME='litellm-local-experiment'
 
+# Langfuse（OTEL 整合；獨立 docker compose 專案，容器透過 host.docker.internal 連宿主機 3000 埠）
+LANGFUSE_OTEL_HOST='http://host.docker.internal:3000'
+LANGFUSE_PUBLIC_KEY='pk-lf-...'
+LANGFUSE_SECRET_KEY='sk-lf-...'
+
 # MiniMax（選用，預設停用 — 需在 config.yaml 的 include 加入 models-minimax.yaml 才生效）
 MINIMAX_API_KEY='your_minimax_api_key_here'
 ```

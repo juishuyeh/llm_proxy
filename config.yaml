@@ -21,9 +21,12 @@ litellm_settings:
   # Debug tool calling / reasoning / response_format 時，可暫時改 false。
   drop_params: true
 
-  # 保留你的 MLflow callback。
+  # MLflow 走 success/failure callback。
   success_callback: ["mlflow"]
   failure_callback: ["mlflow"]
+
+  # Langfuse 走官方建議的 OTEL 整合（同時涵蓋成功與失敗）。
+  callbacks: ["langfuse_otel"]
 
   # 長 reasoning / local model / 大上下文請求可能較慢。
   request_timeout: 600

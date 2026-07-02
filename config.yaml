@@ -26,7 +26,7 @@ litellm_settings:
   failure_callback: ["mlflow"]
 
   # Langfuse 走官方建議的 OTEL 整合（同時涵蓋成功與失敗）。
-  callbacks: ["langfuse_otel"]
+  # callbacks: ["langfuse_otel"]
 
   # 長 reasoning / local model / 大上下文請求可能較慢。
   request_timeout: 600
